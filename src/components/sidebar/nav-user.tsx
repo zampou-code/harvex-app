@@ -23,6 +23,9 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { man, woman } from "@/assets/images/pp";
+
+import Link from "next/link";
 
 export function NavUser({
   user,
@@ -30,7 +33,7 @@ export function NavUser({
   user: {
     name: string;
     email: string;
-    avatar: string;
+    sex: "M" | "F" | string;
   };
 }) {
   const { isMobile } = useSidebar();
@@ -45,8 +48,12 @@ export function NavUser({
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                <AvatarImage
+                  alt={user.name}
+                  className="bg-primary object-contain p-1"
+                  src={user.sex === "M" ? man.src : woman.src}
+                />
+                <AvatarFallback className="rounded-lg">HG</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">{user.name}</span>
@@ -56,16 +63,19 @@ export function NavUser({
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-            side={isMobile ? "bottom" : "right"}
             align="end"
             sideOffset={4}
+            side={isMobile ? "bottom" : "right"}
+            className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
           >
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                  <AvatarImage
+                    alt={user.name}
+                    className="bg-primary object-contain p-1"
+                    src={user.sex === "M" ? man.src : woman.src}
+                  />
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">{user.name}</span>
@@ -77,21 +87,27 @@ export function NavUser({
 
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck />
-                Profile
+              <DropdownMenuItem asChild className="cursor-pointer">
+                <Link href="/dashboard/profil">
+                  <BadgeCheck />
+                  Profile
+                </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCard />
-                KYC
+              <DropdownMenuItem asChild className="cursor-pointer">
+                <Link href="/dashboard/profil#KYC">
+                  <CreditCard />
+                  KYC
+                </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <SquareAsterisk />
-                Mot de passe
+              <DropdownMenuItem asChild className="cursor-pointer">
+                <Link href="/dashboard/profil#password">
+                  <SquareAsterisk />
+                  Mot de passe
+                </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem className="cursor-pointer">
               <LogOut />
               Deconnexion
             </DropdownMenuItem>

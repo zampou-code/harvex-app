@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 import { CheckBroken } from "@/assets/svg";
 import { Element } from "react-scroll";
 

@@ -89,7 +89,7 @@ export default function Footer() {
       <div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-white responvive-p-x py-3">
         <p className="max-md:text-center">
           © 2024 <span className="text-primary font-bold">HARVEX GROUP</span>{" "}
-          tout droit reserveréservé
+          tout droit reservé
         </p>
         <Link href="#" prefetch={false}>
           <Telegram />

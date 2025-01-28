@@ -60,7 +60,6 @@ export default function Historical() {
               ))}
             </div>
           </div>
-
           <p className="text-xs md:text-sm">
             Aujourd&apos;hui, HARVEX GROUPE se distingue comme un partenaire de
             confiance dans l’écosystème financier mondial.

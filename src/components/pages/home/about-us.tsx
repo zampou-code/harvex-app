@@ -30,8 +30,8 @@ export default function AboutUs() {
             </div>
           </div>
         </div>
-        <div className="w-full md:w-1/2 space-y-12">
-          <h2 className="font-bold text-xl md:text-3xl">
+        <div className="w-full md:w-1/2 space-y-5 md:space-y-12">
+          <h2 className="font-bold text-xl md:text-3xl mt-10 md:t-0">
             À propos de <span className="text-primary">HARVEX GROUPE</span>
           </h2>
 
