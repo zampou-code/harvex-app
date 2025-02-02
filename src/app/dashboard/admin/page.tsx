@@ -32,7 +32,8 @@ export default function Page() {
       if (json?.state) {
         setUsers(json.data);
       }
-    } catch (error) {}
+    } finally {
+    }
   };
 
   useEffect(() => {

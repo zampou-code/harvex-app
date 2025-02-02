@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { UserInfo } from "@/types";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/firebase-admin";
 
@@ -62,7 +63,7 @@ export const GET = auth(async function GET(request) {
       .where("referral_id", "==", userData?.referral_code)
       .get();
 
-    let referrals = referralsSnapshot.docs.map((doc) => ({
+    const referrals = referralsSnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
@@ -70,8 +71,8 @@ export const GET = auth(async function GET(request) {
     const last4Referrals = referrals
       .sort(
         (a, b) =>
-          new Date((b as any)?.created_at).getTime() -
-          new Date((b as any)?.created_at).getTime()
+          new Date((b as UserInfo)?.created_at).getTime() -
+          new Date((b as UserInfo)?.created_at).getTime()
       )
       .slice(0, 4);
 
@@ -115,4 +116,4 @@ export const GET = auth(async function GET(request) {
       { status: 500 }
     );
   }
-});
+}) as any;

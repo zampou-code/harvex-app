@@ -148,7 +148,8 @@ export function CardFinance(props: CardFinanceProps) {
           anchorOrigin: { vertical: "top", horizontal: "center" },
         });
       }
-    } catch (error) {}
+    } finally {
+    }
   }
 
   return (

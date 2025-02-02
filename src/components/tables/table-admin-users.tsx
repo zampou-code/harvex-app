@@ -14,15 +14,6 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -174,7 +165,8 @@ export function TableAction(props: TableActionProps) {
           anchorOrigin: { vertical: "top", horizontal: "center" },
         });
       }
-    } catch (error) {}
+    } finally {
+    }
   };
 
   const handleRejectedKYC = async () => {
@@ -209,7 +201,8 @@ export function TableAction(props: TableActionProps) {
           }
         );
       }
-    } catch (error) {}
+    } finally {
+    }
   };
 
   const handleDeleteUser = async () => {
@@ -244,7 +237,8 @@ export function TableAction(props: TableActionProps) {
           }
         );
       }
-    } catch (error) {}
+    } finally {
+    }
   };
 
   return (
@@ -298,7 +292,7 @@ export function TableAction(props: TableActionProps) {
             onClick={handleDeleteUser}
           >
             <Trash className="mr-2 h-4 w-4" />
-            Supprimer l'utilisateur
+            Supprimer l&apos;utilisateur
           </Button>
         </DropdownMenuItem>
       </DropdownMenuContent>

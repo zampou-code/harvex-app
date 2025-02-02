@@ -152,4 +152,4 @@ export const POST = auth(async function POST(request) {
       { status: 500 }
     );
   }
-});
+}) as any;

@@ -1,13 +1,9 @@
 "use client";
 
-import { BadgeDollarSign, DollarSign, Headset, Mail } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Headset, Mail } from "lucide-react";
 
-type CardSupportDetailsProps = {};
-
-export function CardSupportDetails(props: CardSupportDetailsProps) {
-  const {} = props;
-
+export function CardSupportDetails() {
   return (
     <Card className="md:h-[calc(100%-25px)]">
       <CardContent className="pt-6 space-y-5">
@@ -39,7 +35,7 @@ export function CardSupportDetails(props: CardSupportDetailsProps) {
             Notre équipe de support est disponible pour vous assister du lundi
             au vendredi de 9h à 18h, ainsi que les samedis et dimanches de 9h à
             14h. Nous nous engageons à répondre à vos demandes dans les
-            meilleurs délais pendant ces horaires d'ouverture.
+            meilleurs délais pendant ces horaires d&apos;ouverture.
           </p>
         </div>
       </CardContent>

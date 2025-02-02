@@ -18,12 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  deleteObject,
-  getDownloadURL,
-  ref,
-  uploadBytes,
-} from "firebase/storage";
+import { deleteObject, ref, uploadBytes } from "firebase/storage";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -84,7 +79,8 @@ export function CardKYC(props: CardKYCProps) {
         const oldFileRef = ref(storage, user.kyc.file);
         try {
           await deleteObject(oldFileRef);
-        } catch (error) {}
+        } finally {
+        }
       }
 
       const path = `kyc/${Date.now()}.${values.file.name.split(".").pop()}`;
@@ -125,7 +121,8 @@ export function CardKYC(props: CardKYCProps) {
           }
         );
       }
-    } catch (error) {}
+    } finally {
+    }
   }
 
   return (

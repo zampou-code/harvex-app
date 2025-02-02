@@ -39,7 +39,8 @@ export default function Page() {
         if (json?.state) {
           setDashboardData(json?.data);
         }
-      } catch (error) {}
+      } finally {
+      }
     };
 
     fetchDashboardData();

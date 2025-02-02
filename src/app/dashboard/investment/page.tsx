@@ -43,7 +43,8 @@ export default function Page() {
 
           setInvestments(investmentTransactions);
         }
-      } catch (error) {}
+      } finally {
+      }
     };
 
     fetchInvestments();

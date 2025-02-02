@@ -1,6 +1,7 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
+import { Country, isValidPhoneNumber } from "react-phone-number-input";
 import {
   Form,
   FormControl,
@@ -22,9 +23,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PhoneInput } from "@/components/ui/phone-input";
-import { Skeleton } from "../ui/skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 import { UserInfo } from "@/types";
-import { isValidPhoneNumber } from "react-phone-number-input";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useSnackbar } from "notistack";
@@ -100,7 +100,7 @@ export function CardInfo(props: CardInfoProps) {
       form.setValue("city", user.city);
       form.setValue("sex", user.sex);
     }
-  }, [user]);
+  }, [user, form]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
@@ -131,7 +131,8 @@ export function CardInfo(props: CardInfoProps) {
           anchorOrigin: { vertical: "top", horizontal: "center" },
         });
       }
-    } catch (error) {}
+    } finally {
+    }
   }
 
   return (
@@ -204,7 +205,7 @@ export function CardInfo(props: CardInfoProps) {
                         {user ? (
                           <PhoneInput
                             {...field}
-                            defaultCountry={(user ? user.country : "CI") as any}
+                            defaultCountry={(user?.country as Country) || "CI"}
                             onCountryChange={(country) => {
                               if (!country) return;
                               form.setValue("country", country);

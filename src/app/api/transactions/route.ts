@@ -33,7 +33,7 @@ export const GET = auth(async function GET(request) {
       { status: 500 }
     );
   }
-});
+}) as any;
 
 export const POST = auth(async function POST(request) {
   if (!request.auth)
@@ -140,4 +140,4 @@ export const POST = auth(async function POST(request) {
       { status: 500 }
     );
   }
-});
+}) as any;

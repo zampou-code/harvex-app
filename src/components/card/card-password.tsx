@@ -10,13 +10,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Loader, Save } from "lucide-react";
-import { app, auth } from "@/lib/firebase";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "../ui/skeleton";
 import { UserInfo } from "@/types";
-import { getAuth } from "firebase/auth";
 import { useForm } from "react-hook-form";
 import { useSnackbar } from "notistack";
 import { z } from "zod";
@@ -99,7 +97,8 @@ export function CardPassword(props: CardPasswordProps) {
           }
         );
       }
-    } catch (error) {}
+    } finally {
+    }
   }
 
   return (

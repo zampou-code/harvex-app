@@ -12,6 +12,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import { PackData, Transaction } from "@/types";
 import {
   Table,
   TableBody,
@@ -26,7 +27,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "../ui/button";
 import { Inbox } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Transaction } from "@/types";
 import { cn } from "@/lib/utils";
 
 export const columns: ColumnDef<Transaction>[] = [
@@ -68,7 +68,7 @@ export const columns: ColumnDef<Transaction>[] = [
             case "success":
               return "Succès";
             case "pending":
-              if ((row.getValue("pack") as any)?.id) {
+              if ((row.getValue("pack") as PackData)?.id) {
                 return "En cours...";
               } else {
                 return "En attente...";
@@ -100,7 +100,8 @@ export const columns: ColumnDef<Transaction>[] = [
     accessorKey: "pack",
     header: () => <div className="text-left">Pack</div>,
     cell: ({ row }) => {
-      const pack = row.getValue("pack") as any;
+      const pack = row.getValue("pack") as PackData;
+
       return (
         <div className="text-left font-medium capitalize">
           {pack?.name || "N/A"}
@@ -228,7 +229,7 @@ export function TableHistoricalInvestment(
                   className="text-center hover:bg-white"
                 >
                   <Inbox className="mx-auto" />
-                  <p>Pas encore d'historique</p>
+                  <p>Pas encore d&apos;historique</p>
                 </TableCell>
               </TableRow>
             )}

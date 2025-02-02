@@ -52,7 +52,10 @@ export function PackForm(props: PackFormProps) {
     }
   };
 
-  const handleSelectionChange = (type: "duration" | "amount", value: any) => {
+  const handleSelectionChange = (
+    type: "duration" | "amount",
+    value: string
+  ) => {
     if (type === "duration") {
       setSelectedDuration(value);
     } else {
@@ -61,8 +64,9 @@ export function PackForm(props: PackFormProps) {
 
     const found = data.find(
       (d) =>
-        d.number_of_day == (type === "duration" ? value : selectedDuration) &&
-        d.amount == (type === "amount" ? value : selectedAmount)
+        d.number_of_day ===
+          Number(type === "duration" ? value : selectedDuration) &&
+        d.amount === Number(type === "amount" ? value : selectedAmount)
     );
 
     setRoi(found ? found.roi : 0);

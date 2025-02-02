@@ -27,7 +27,9 @@ export function CardReferal(props: CardReferalProps) {
 
   function copyReferalLink() {
     navigator.clipboard.writeText(
-      `https://harvexgroup.com/register/${user?.referral_code || ""}`
+      `https://harvexgroup.com/register?referral_id=${
+        user?.referral_code || ""
+      }`
     );
     enqueueSnackbar("Lien de parrainage copié avec succès", {
       variant: "success",

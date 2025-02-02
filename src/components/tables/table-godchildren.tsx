@@ -3,7 +3,6 @@
 import * as React from "react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChevronRight, Frown } from "lucide-react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -27,7 +26,7 @@ import {
 } from "@/components/ui/table";
 import { useEffect, useState } from "react";
 
-import { Button } from "@/components/ui/button";
+import { Frown } from "lucide-react";
 
 export const columns: ColumnDef<UserInfo>[] = [
   {

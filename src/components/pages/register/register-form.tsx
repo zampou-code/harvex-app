@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { AuthImage } from "@/assets/images";
 import { Button } from "@/components/ui/button";
@@ -30,7 +31,6 @@ import { cn } from "@/lib/utils";
 import { enqueueSnackbar } from "notistack";
 import { isValidPhoneNumber } from "react-phone-number-input";
 import { useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -100,10 +100,11 @@ const formSchema = z
 
 export function RegisterForm({
   className,
-  referralId,
   ...props
-}: React.ComponentProps<"div"> & { referralId?: string }) {
+}: React.ComponentProps<"div">) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const referralId = searchParams.get("referral_id");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -146,7 +147,8 @@ export function RegisterForm({
           }
         );
       }
-    } catch (error) {}
+    } finally {
+    }
   }
 
   return (

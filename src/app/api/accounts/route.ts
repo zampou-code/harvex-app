@@ -16,6 +16,7 @@ export const GET = auth(async function GET(request) {
       );
 
     const userDoc = await db.collection("users").doc(user_id).get();
+
     if (!userDoc.exists) {
       return NextResponse.json(
         { error: "User not found", state: false },
@@ -63,4 +64,4 @@ export const GET = auth(async function GET(request) {
       { status: 500 }
     );
   }
-});
+}) as any;

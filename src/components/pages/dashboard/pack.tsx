@@ -63,7 +63,8 @@ export default function Pack() {
         );
         throw Error("Error while creating the transaction");
       }
-    } catch (error) {}
+    } finally {
+    }
   }
 
   function printPackForm(name: string) {

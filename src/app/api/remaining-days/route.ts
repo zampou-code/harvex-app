@@ -1,6 +1,5 @@
-import { addDays, differenceInDays } from "date-fns";
-
 import { NextResponse } from "next/server";
+import { differenceInDays } from "date-fns";
 
 export async function POST(request: Request) {
   try {

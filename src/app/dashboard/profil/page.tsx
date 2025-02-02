@@ -36,7 +36,8 @@ export default function Page() {
         if (json?.state) {
           setUser(json?.data);
         }
-      } catch (err: any) {}
+      } finally {
+      }
     };
 
     fetchUserInfo();

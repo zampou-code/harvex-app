@@ -33,7 +33,8 @@ export default function Page() {
         if (json?.state) {
           setInvestments(json.data);
         }
-      } catch (error) {}
+      } finally {
+      }
     };
 
     fetchInvestments();

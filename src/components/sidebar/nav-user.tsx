@@ -49,7 +49,8 @@ export function NavUser(props: NavUserProps) {
       if (json?.state) {
         router.push("/");
       }
-    } catch (error) {}
+    } finally {
+    }
   }
 
   return (

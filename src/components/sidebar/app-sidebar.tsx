@@ -98,7 +98,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       if (json?.state) {
         setUser(json?.data);
       }
-    } catch (err: any) {}
+    } finally {
+    }
   };
 
   useEffect(() => {

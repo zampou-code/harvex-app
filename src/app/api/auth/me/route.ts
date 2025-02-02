@@ -3,29 +3,25 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/firebase-admin";
 
 export const GET = auth(async function GET(request) {
-  if (!request.auth)
+  if (!request.auth) {
     return NextResponse.json({ message: "Not Authenticated" }, { status: 401 });
+  }
 
   try {
     const user_id = request.auth.user?.id;
-
     if (!user_id)
       return NextResponse.json(
         { message: "Not Authenticated" },
         { status: 401 }
       );
-
     const userDoc = await db.collection("users").doc(user_id).get();
-
     if (!userDoc.exists) {
       return NextResponse.json(
         { error: "User not found", state: false },
         { status: 404 }
       );
     }
-
     const userData = userDoc.data();
-
     return NextResponse.json(
       {
         state: true,
@@ -47,7 +43,7 @@ export const GET = auth(async function GET(request) {
       { status: 500 }
     );
   }
-});
+}) as any;
 
 export const POST = auth(async function POST(request) {
   if (!request.auth)
@@ -111,4 +107,4 @@ export const POST = auth(async function POST(request) {
       { status: 500 }
     );
   }
-});
+}) as any;

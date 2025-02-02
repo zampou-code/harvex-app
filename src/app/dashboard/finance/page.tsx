@@ -41,7 +41,8 @@ export default function Page() {
         if (json?.state) {
           setAccount(json?.data);
         }
-      } catch (err: any) {}
+      } finally {
+      }
     };
 
     fetchUserInfo();

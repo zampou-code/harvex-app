@@ -20,6 +20,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { PackData, Transaction } from "@/types";
 import {
   Table,
   TableBody,
@@ -33,7 +34,6 @@ import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "../ui/button";
 import { Input } from "@/components/ui/input";
-import { Transaction } from "@/types";
 import { cn } from "@/lib/utils";
 import { useSnackbar } from "notistack";
 
@@ -76,7 +76,7 @@ export const columns: ColumnDef<Transaction>[] = [
             case "success":
               return "Succès";
             case "pending":
-              if ((row.getValue("pack") as any)?.id) {
+              if ((row.getValue("pack") as PackData)?.id) {
                 return "En cours...";
               } else {
                 return "En attente...";
@@ -108,7 +108,7 @@ export const columns: ColumnDef<Transaction>[] = [
     accessorKey: "pack",
     header: () => <div className="text-left">Pack</div>,
     cell: ({ row }) => {
-      const pack = row.getValue("pack") as any;
+      const pack = row.getValue("pack") as PackData;
       return (
         <div className="text-left font-medium capitalize">
           {pack?.name || "N/A"}
@@ -188,7 +188,8 @@ export function TableAction(props: TableActionProps) {
           anchorOrigin: { vertical: "top", horizontal: "center" },
         });
       }
-    } catch (error) {}
+    } finally {
+    }
   };
 
   const handleRejectedTransaction = async () => {
@@ -220,7 +221,8 @@ export function TableAction(props: TableActionProps) {
           anchorOrigin: { vertical: "top", horizontal: "center" },
         });
       }
-    } catch (error) {}
+    } finally {
+    }
   };
 
   const handleDeleteTransaction = async () => {
@@ -251,7 +253,8 @@ export function TableAction(props: TableActionProps) {
           anchorOrigin: { vertical: "top", horizontal: "center" },
         });
       }
-    } catch (error) {}
+    } finally {
+    }
   };
 
   return (
@@ -387,7 +390,7 @@ export function TableAdminTransactions(props: TableAdminTransactionsProps) {
                   className="text-center hover:bg-white"
                 >
                   <Inbox className="mx-auto" />
-                  <p>Pas encore d'historique</p>
+                  <p>Pas encore d&apos;historique</p>
                 </TableCell>
               </TableRow>
             )}
