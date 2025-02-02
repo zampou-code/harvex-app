@@ -10,7 +10,7 @@ import Link from "next/link";
 export default function HeroBanner() {
   return (
     <Element name="home" as="section" className="bg-white">
-      <div className="responvive-p-x pt-5">
+      <div className="responvive-p-x pt-24">
         <div className="md:bg-[url('/hero-bg.png')] bg-top bg-cover bg-no-repeat flex max-md:flex-col justify-between items-center gap-10">
           <div className="w-full md:w-1/2 space-y-7">
             <h1 className="font-bold text-xl md:text-3xl">

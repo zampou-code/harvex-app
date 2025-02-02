@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -11,6 +13,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { useEffect, useState } from "react";
 
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import { CardInfo } from "@/components/card/card-info";
@@ -18,8 +21,27 @@ import { CardKYC } from "@/components/card/cark-kyc";
 import { CardPassword } from "@/components/card/card-password";
 import { HistoricalImage } from "@/assets/images";
 import { Separator } from "@/components/ui/separator";
+import { UserInfo } from "@/types";
 
 export default function Page() {
+  const [user, setUser] = useState<UserInfo | undefined>(undefined);
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const response = await fetch("/api/auth/me");
+
+        const json = await response.json();
+
+        if (json?.state) {
+          setUser(json?.data);
+        }
+      } catch (err: any) {}
+    };
+
+    fetchUserInfo();
+  }, []);
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -45,11 +67,11 @@ export default function Page() {
           <div className="grid auto-rows-min gap-4 md:grid-cols-12">
             <div className="md:col-span-8 rounded-xl md:min-h-min">
               <h2 className="text-sm font-bold pb-2 pl-2">Profile</h2>
-              <CardInfo />
+              <CardInfo user={user} />
               <h2 className="text-sm font-bold py-2 pl-2">KYC</h2>
-              <CardKYC />
+              <CardKYC user={user} />
               <h2 className="text-sm font-bold py-2 pl-2">Mot de passe</h2>
-              <CardPassword />
+              <CardPassword user={user} />
             </div>
             <div className="md:col-span-4 rounded-xl md:min-h-min overflow-hidden hidden md:block">
               <HistoricalImage

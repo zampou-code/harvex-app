@@ -3,7 +3,7 @@
 import * as React from "react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChevronRight, Inbox } from "lucide-react";
+import { ChevronRight, Frown } from "lucide-react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -16,6 +16,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import { Referrals, UserInfo } from "@/types";
 import {
   Table,
   TableBody,
@@ -24,81 +25,62 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 
-const data: Payment[] = [
+export const columns: ColumnDef<UserInfo>[] = [
   {
-    id: "m5gr84i9",
-    amount: 3160,
-    status: "success",
-  },
-  {
-    id: "3u1reuv4",
-    amount: 2420,
-    status: "success",
-  },
-  {
-    id: "derv1ws0",
-    amount: 8370,
-    status: "processing",
-  },
-  {
-    id: "5kma53ae",
-    amount: 8740,
-    status: "success",
-  },
-];
-
-export type Payment = {
-  id: string;
-  amount: number;
-  status: "pending" | "processing" | "success" | "failed";
-};
-
-export const columns: ColumnDef<Payment>[] = [
-  {
-    accessorKey: "id",
-    header: () => <div className="text-left">ID</div>,
-    cell: ({ row }) => <div className="uppercase">{row.getValue("id")}</div>,
-  },
-  {
-    accessorKey: "status",
-    header: "Status",
+    accessorKey: "firstname",
+    header: () => <div className="text-left">Nom</div>,
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("status")}</div>
+      <div className="capitalize">{row.getValue("firstname")}</div>
     ),
   },
-
   {
-    accessorKey: "amount",
-    header: () => <div className="text-right">Montant</div>,
+    accessorKey: "lastname",
+    header: "Prenom",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("lastname")}</div>
+    ),
+  },
+  {
+    accessorKey: "created_at",
+    header: () => <div className="text-right">Date</div>,
     cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("amount"));
-
-      const formatted = new Intl.NumberFormat("fr-CF", {
-        style: "currency",
-        currency: "XOF",
-      }).format(amount);
-
-      return <div className="text-right font-medium">{formatted}</div>;
+      const date = new Date(row.getValue("created_at"));
+      const formattedDate = date.toLocaleDateString("fr-FR");
+      return <div className="capitalize text-right">{formattedDate}</div>;
     },
   },
 ];
 
-export function TableCodchildren() {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
+type TableGodchildrenProps = {
+  referrals?: Referrals;
+};
+
+export function TableGodchildren(props: TableGodchildrenProps) {
+  const { referrals } = props;
+  const [data, setData] = useState<UserInfo[]>([]);
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = useState({});
+
+  useEffect(() => {
+    if (referrals?.referals) {
+      setData(referrals.referals);
+    }
+  }, [referrals]);
 
   const table = useReactTable({
     data,
-    // data: [],
     columns,
+    initialState: {
+      pagination: {
+        pageSize: 4,
+      },
+    },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -118,17 +100,13 @@ export function TableCodchildren() {
   return (
     <Card className="h-full">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-5">
-        <CardTitle className="text-lg font-bold">
-          Historique des transactions
-        </CardTitle>
-        <Button variant="outline" size="sm">
+        <CardTitle className="text-lg font-bold">Liste des filleules</CardTitle>
+        {/* <Button variant="outline" size="sm">
           Voir tout
           <ChevronRight className="-mr-1.5" />
-        </Button>
+        </Button> */}
       </CardHeader>
       <CardContent className="h-[200px]">
-        {/* <CardContent className="overflow-scroll h-[200px]"> */}
-        {/* <CardContent className="overflow-y-scroll h-full"> */}
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -166,15 +144,13 @@ export function TableCodchildren() {
                 </TableRow>
               ))
             ) : (
-              <TableRow className="h-full mt-2 overflow-hidden bg-black">
-                {/* <TableRow className="h-[150px]"> */}
-                {/* <TableRow className="h-[50vh]"> */}
+              <TableRow className="h-full overflow-hidden">
                 <TableCell
                   colSpan={columns.length}
-                  className="text-center hover:bg-white"
+                  className="text-center hover:bg-white pt-10"
                 >
-                  <Inbox className="mx-auto" />
-                  <p>Pas encore de transaction</p>
+                  <Frown className="mx-auto" />
+                  <p>Pas encore de filleules</p>
                 </TableCell>
               </TableRow>
             )}

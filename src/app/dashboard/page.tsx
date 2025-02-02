@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -5,22 +7,44 @@ import {
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
 import {
-  CardIcome,
-  CardInvestment,
+  CardMainBalance,
   CardRSICalculator,
   CardReferal,
+  CardReferralBalance,
 } from "@/components/card";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { TableCodchildren, TableInvestment } from "@/components/tables";
+import { TableGodchildren, TableInvestment } from "@/components/tables";
+import { useEffect, useState } from "react";
 
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
+import { DashboardData } from "@/types";
 import { Separator } from "@/components/ui/separator";
 
 export default function Page() {
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(
+    null
+  );
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const response = await fetch("/api/dashboard-data");
+
+        const json = await response.json();
+
+        if (json?.state) {
+          setDashboardData(json?.data);
+        }
+      } catch (error) {}
+    };
+
+    fetchDashboardData();
+  }, []);
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -40,17 +64,23 @@ export default function Page() {
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 lg:px-10 pt-0">
           <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-            <CardIcome />
-            <CardInvestment />
-            <CardReferal />
+            <CardMainBalance
+              kyc={dashboardData?.user?.kyc}
+              account={dashboardData?.account}
+            />
+            <CardReferralBalance account={dashboardData?.account} />
+            <CardReferal
+              user={dashboardData?.user}
+              referrals={dashboardData?.referrals}
+            />
           </div>
           <div className="grid auto-rows-min gap-4 md:grid-cols-12">
             <div className="md:col-span-7 rounded-xl md:min-h-min">
-              <TableInvestment />
+              <TableInvestment transactions={dashboardData?.transactions} />
             </div>
             <div className="md:col-span-5 rounded-xl md:min-h-min">
               <div className="rounded-xl mb-4">
-                <TableCodchildren />
+                <TableGodchildren referrals={dashboardData?.referrals} />
               </div>
               <div className="rounded-xl">
                 <CardRSICalculator />

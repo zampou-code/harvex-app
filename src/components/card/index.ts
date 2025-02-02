@@ -1,4 +1,4 @@
-export { CardIcome } from "./card-income";
+export { CardMainBalance } from "./card-main-balance";
 export { CardReferal } from "./card-referal";
 export { CardRSICalculator } from "./card-rsi-calculator";
-export { CardInvestment } from "./card-investment";
+export { CardReferralBalance } from "./card-referral-balance";

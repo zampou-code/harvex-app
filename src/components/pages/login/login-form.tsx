@@ -14,8 +14,12 @@ import { AuthImage } from "@/assets/images";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import { Loader } from "lucide-react";
+import React from "react";
 import { cn } from "@/lib/utils";
 import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
+import { useSnackbar } from "notistack";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -37,16 +41,44 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const router = useRouter();
+  const { enqueueSnackbar } = useSnackbar();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
-      password: "",
+      password: "Pa$$w0rd!",
+      email: "zampou.elec@gmail.com",
+      // password: "12345678",
+      // email: "mail@gmail.com",
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+        },
+        body: JSON.stringify(values),
+      });
+
+      const json = await res.json();
+
+      if (json?.state) {
+        router.push("/dashboard");
+      } else {
+        enqueueSnackbar("Email ou mot de passe invalide", {
+          variant: "error",
+          preventDuplicate: true,
+          autoHideDuration: 3000,
+          anchorOrigin: { vertical: "top", horizontal: "center" },
+        });
+      }
+    } catch (error) {
+      console.error("Erreur lors de la connexion :", error);
+    }
   }
 
   return (
@@ -100,7 +132,14 @@ export function LoginForm({
                   )}
                 />
 
-                <Button type="submit" className="w-full">
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={form.formState.isSubmitting}
+                >
+                  {form.formState.isSubmitting && (
+                    <Loader className="animate-spin" />
+                  )}{" "}
                   Connexion
                 </Button>
 

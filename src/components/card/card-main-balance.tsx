@@ -7,9 +7,12 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { AccountBalance, UserKYC } from "@/types";
 import NumberFlow from "@number-flow/react";
 import { BadgeDollarSign } from "lucide-react";
 import { Line, LineChart } from "recharts";
+import { Skeleton } from "@/components/ui/skeleton";
+import { KYCBadge } from "@/assets/images";
 
 const data = [
   {
@@ -40,31 +43,46 @@ const data = [
 
 const chartConfig = {
   revenue: {
-    label: "Revenue",
+    label: "Solde",
     color: "hsl(var(--primary))",
   },
 } satisfies ChartConfig;
 
-export function CardIcome() {
+type CardMainBalanceProps = {
+  kyc?: UserKYC;
+  account?: AccountBalance;
+};
+export function CardMainBalance(props: CardMainBalanceProps) {
+  const { account, kyc } = props;
+
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-bold">Revenue total</CardTitle>
+      <CardHeader className="relative flex flex-row items-center justify-between space-y-0 pb-2">
+        {kyc?.status === "approved" && (
+          <div className="absolute -top-4 -left-4 w-12 h-12">
+            <KYCBadge alt="" className="w-full h-full object-contain" />
+          </div>
+        )}
+        <CardTitle className="text-sm font-bold">Solde principal</CardTitle>
         <BadgeDollarSign className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent className="pb-0">
-        <NumberFlow
-          value={15231}
-          className="text-2xl font-bold"
-          format={{
-            style: "currency",
-            currency: "XOF",
-            trailingZeroDisplay: "stripIfInteger",
-          }}
-        />
+        {account ? (
+          <NumberFlow
+            value={account?.main}
+            className="text-2xl font-bold"
+            format={{
+              style: "currency",
+              currency: "XOF",
+              trailingZeroDisplay: "stripIfInteger",
+            }}
+          />
+        ) : (
+          <Skeleton className="w-full h-7 mb-2" />
+        )}
         <p className="text-xs text-muted-foreground">
-          <span className="text-primary">+20,1%</span> par rapport au mois
-          dernier
+          <span className="text-primary">Investissez maintenant</span> et
+          maximiser vos rendements
         </p>
         <ChartContainer config={chartConfig} className="h-[80px] w-full pb-2">
           <LineChart

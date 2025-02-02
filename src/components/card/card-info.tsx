@@ -9,6 +9,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Loader, Save } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -21,9 +22,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PhoneInput } from "@/components/ui/phone-input";
-import { Save } from "lucide-react";
+import { Skeleton } from "../ui/skeleton";
+import { UserInfo } from "@/types";
 import { isValidPhoneNumber } from "react-phone-number-input";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useSnackbar } from "notistack";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -61,12 +65,18 @@ const formSchema = z.object({
     .nonempty({
       message: "Le ville ne peut pas être vide.",
     }),
-  sex: z.string().refine((data) => data === "H" || data === "F", {
-    message: "Veuillez entrer H ou F pour le sexe.",
+  sex: z.string().refine((data) => data === "M" || data === "F", {
+    message: "Veuillez entrer Homme ou Femme pour le sexe.",
   }),
 });
 
-export function CardInfo() {
+type CardInfoProps = {
+  user?: UserInfo;
+};
+
+export function CardInfo(props: CardInfoProps) {
+  const { user } = props;
+  const { enqueueSnackbar } = useSnackbar();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -76,12 +86,52 @@ export function CardInfo() {
       phone: "",
       country: "",
       city: "",
-      sex: "H",
+      sex: "M",
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  useEffect(() => {
+    if (user) {
+      form.setValue("firstname", user.firstname);
+      form.setValue("lastname", user.lastname);
+      form.setValue("email", user.email);
+      form.setValue("phone", user.phone);
+      form.setValue("country", user.country);
+      form.setValue("city", user.city);
+      form.setValue("sex", user.sex);
+    }
+  }, [user]);
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      const res = await fetch("/api/auth/me", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+        },
+        body: JSON.stringify(values),
+      });
+
+      const json = await res.json();
+
+      if (json?.state) {
+        window.dispatchEvent(new CustomEvent("user-info-updated"));
+
+        enqueueSnackbar(json?.message, {
+          variant: "success",
+          preventDuplicate: true,
+          autoHideDuration: 3000,
+          anchorOrigin: { vertical: "top", horizontal: "center" },
+        });
+      } else {
+        enqueueSnackbar(json?.message, {
+          variant: "error",
+          preventDuplicate: true,
+          autoHideDuration: 3000,
+          anchorOrigin: { vertical: "top", horizontal: "center" },
+        });
+      }
+    } catch (error) {}
   }
 
   return (
@@ -98,7 +148,11 @@ export function CardInfo() {
                     <FormItem className="space-y-0 flex-1">
                       <FormLabel>Nom</FormLabel>
                       <FormControl>
-                        <Input placeholder="John" {...field} />
+                        {user ? (
+                          <Input placeholder="John" {...field} />
+                        ) : (
+                          <Skeleton className="w-full h-9" />
+                        )}
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -111,7 +165,11 @@ export function CardInfo() {
                     <FormItem className="space-y-0 flex-1">
                       <FormLabel>Prénom(s)</FormLabel>
                       <FormControl>
-                        <Input placeholder="Doe" {...field} />
+                        {user ? (
+                          <Input placeholder="Doe" {...field} />
+                        ) : (
+                          <Skeleton className="w-full h-9" />
+                        )}
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -126,13 +184,16 @@ export function CardInfo() {
                     <FormItem className="space-y-0 flex-1">
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input placeholder="m@mail.com" {...field} />
+                        {user ? (
+                          <Input placeholder="m@mail.com" {...field} />
+                        ) : (
+                          <Skeleton className="w-full h-9" />
+                        )}
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-
                 <FormField
                   name="phone"
                   control={form.control}
@@ -140,14 +201,18 @@ export function CardInfo() {
                     <FormItem className="space-y-0 flex-1">
                       <FormLabel>Numéro de téléphone</FormLabel>
                       <FormControl>
-                        <PhoneInput
-                          {...field}
-                          defaultCountry="CI"
-                          onCountryChange={(country) => {
-                            if (!country) return;
-                            form.setValue("country", country);
-                          }}
-                        />
+                        {user ? (
+                          <PhoneInput
+                            {...field}
+                            defaultCountry={(user ? user.country : "CI") as any}
+                            onCountryChange={(country) => {
+                              if (!country) return;
+                              form.setValue("country", country);
+                            }}
+                          />
+                        ) : (
+                          <Skeleton className="w-full h-9" />
+                        )}
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -162,7 +227,11 @@ export function CardInfo() {
                     <FormItem className="space-y-0 flex-1">
                       <FormLabel>Ville</FormLabel>
                       <FormControl>
-                        <Input placeholder="Cassablanca" {...field} />
+                        {user ? (
+                          <Input placeholder="Cassablanca" {...field} />
+                        ) : (
+                          <Skeleton className="w-full h-9" />
+                        )}
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -172,19 +241,23 @@ export function CardInfo() {
                   name="sex"
                   control={form.control}
                   render={({ field }) => (
-                    <FormItem className="space-y-0">
+                    <FormItem className="space-y-0 relative">
                       <FormLabel>Sexe</FormLabel>
+                      {!user && <Skeleton className="absolute w-[120px] h-9" />}
                       <FormControl>
                         <Select
                           value={field.value}
                           onValueChange={field.onChange}
                         >
-                          <SelectTrigger className="w-[120px]">
+                          <SelectTrigger
+                            className="w-[120px]"
+                            style={{ opacity: user ? 1 : 0 }}
+                          >
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectGroup>
-                              <SelectItem value="H">Homme</SelectItem>
+                              <SelectItem value="M">Homme</SelectItem>
                               <SelectItem value="F">Femme</SelectItem>
                             </SelectGroup>
                           </SelectContent>
@@ -196,10 +269,18 @@ export function CardInfo() {
                 />
               </div>
               <div className="flex justify-end">
-                <Button type="submit">
-                  <Save />
-                  Sauvegarder
-                </Button>
+                {user ? (
+                  <Button type="submit" disabled={form.formState.isSubmitting}>
+                    {form.formState.isSubmitting ? (
+                      <Loader className="animate-spin" />
+                    ) : (
+                      <Save />
+                    )}
+                    Sauvegarder
+                  </Button>
+                ) : (
+                  <Skeleton className="w-40 h-9" />
+                )}
               </div>
             </div>
           </form>

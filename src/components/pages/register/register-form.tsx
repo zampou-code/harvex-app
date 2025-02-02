@@ -23,75 +23,88 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import { Loader } from "lucide-react";
 import { PhoneInput } from "@/components/ui/phone-input";
+import React from "react";
 import { cn } from "@/lib/utils";
+import { enqueueSnackbar } from "notistack";
 import { isValidPhoneNumber } from "react-phone-number-input";
 import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-const formSchema = z.object({
-  firstname: z
-    .string()
-    .min(4, {
-      message: "Le nom doit comporter au moins 4 caractères.",
-    })
-    .nonempty({
-      message: "Le nom ne peut pas être vide.",
+const formSchema = z
+  .object({
+    firstname: z
+      .string()
+      .min(4, {
+        message: "Le nom doit comporter au moins 4 caractères.",
+      })
+      .nonempty({
+        message: "Le nom ne peut pas être vide.",
+      }),
+    lastname: z
+      .string()
+      .min(4, {
+        message: "Le nom doit comporter au moins 4 caractères.",
+      })
+      .nonempty({
+        message: "Le nom ne peut pas être vide.",
+      }),
+    email: z.string().email({
+      message: "Veuillez entrer une adresse email valide.",
     }),
-  lastname: z
-    .string()
-    .min(4, {
-      message: "Le nom doit comporter au moins 4 caractères.",
-    })
-    .nonempty({
-      message: "Le nom ne peut pas être vide.",
+    country: z.string().refine((val) => !!val, {
+      message: "Le numéro de téléphone ne peut pas être vide.",
+      path: ["phone"],
     }),
-  email: z.string().email({
-    message: "Veuillez entrer une adresse email valide.",
-  }),
-  country: z
-    .string({ required_error: "" })
-    .nonempty({ message: "Le pays ne peut pas être vide." }),
-  phone: z.string().refine(isValidPhoneNumber, {
-    message: "Veuillez entrer un numéro de téléphone valide.",
-  }),
-  city: z
-    .string()
-    .min(4, {
-      message: "La ville doit comporter au moins 4 caractères.",
-    })
-    .nonempty({
-      message: "Le ville ne peut pas être vide.",
+    phone: z.string().refine(isValidPhoneNumber, {
+      message: "Veuillez entrer un numéro de téléphone valide.",
     }),
-  sex: z.string().refine((data) => data === "H" || data === "F", {
-    message: "Veuillez entrer H ou F pour le sexe.",
-  }),
-  "confirm-old": z.boolean().refine((data) => data === true, {
-    message: "Veuillez confirmer que vius être âgé(e) de plus de 18 ans",
-  }),
-  password: z
-    .string()
-    .min(8, {
-      message: "Le mot de passe doit comporter au moins 8 caractères.",
-    })
-    .nonempty({
-      message: "Le mot de passe ne peut pas être vide.",
+    city: z
+      .string()
+      .min(4, {
+        message: "La ville doit comporter au moins 4 caractères.",
+      })
+      .nonempty({
+        message: "Le ville ne peut pas être vide.",
+      }),
+    sex: z.string().refine((data) => data === "M" || data === "F", {
+      message: "Veuillez entrer H ou F pour le sexe.",
     }),
-  "confirm-password": z
-    .string()
-    .min(8, {
-      message: "Le mot de passe doit comporter au moins 8 caractères.",
-    })
-    .nonempty({
-      message: "Le mot de passe ne peut pas être vide.",
+    confirmOld: z.boolean().refine((data) => data === true, {
+      message: "Veuillez confirmer que vius être âgé(e) de plus de 18 ans",
     }),
-});
+    password: z
+      .string()
+      .min(8, {
+        message: "Le mot de passe doit comporter au moins 8 caractères.",
+      })
+      .nonempty({
+        message: "Le mot de passe ne peut pas être vide.",
+      }),
+    confirmPassword: z
+      .string()
+      .min(8, {
+        message: "Le mot de passe doit comporter au moins 8 caractères.",
+      })
+      .nonempty({
+        message: "Le mot de passe ne peut pas être vide.",
+      }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Les mots de passe ne correspondent pas",
+    path: ["confirmPassword"],
+  });
 
 export function RegisterForm({
   className,
+  referralId,
   ...props
-}: React.ComponentProps<"div">) {
+}: React.ComponentProps<"div"> & { referralId?: string }) {
+  const router = useRouter();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -99,17 +112,41 @@ export function RegisterForm({
       lastname: "",
       email: "",
       phone: "",
-      country: "",
+      country: "CI",
       city: "",
-      sex: "H",
-      "confirm-old": false,
+      sex: "M",
+      confirmOld: false,
       password: "",
-      "confirm-password": "",
+      confirmPassword: "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+        },
+        body: JSON.stringify({ values, referral_id: referralId || "" }),
+      });
+
+      const json = await res.json();
+
+      if (json?.state) {
+        router.push("/login");
+      } else {
+        enqueueSnackbar(
+          "Une erreur s'est produite lors de l'inscription. Veuillez vérifier vos informations et réessayer.",
+          {
+            variant: "error",
+            preventDuplicate: true,
+            autoHideDuration: 3000,
+            anchorOrigin: { vertical: "top", horizontal: "center" },
+          }
+        );
+      }
+    } catch (error) {}
   }
 
   return (
@@ -220,7 +257,7 @@ export function RegisterForm({
                             </SelectTrigger>
                             <SelectContent>
                               <SelectGroup>
-                                <SelectItem value="H">Homme</SelectItem>
+                                <SelectItem value="M">Homme</SelectItem>
                                 <SelectItem value="F">Femme</SelectItem>
                               </SelectGroup>
                             </SelectContent>
@@ -245,7 +282,7 @@ export function RegisterForm({
                   )}
                 />
                 <FormField
-                  name="confirm-password"
+                  name="confirmPassword"
                   control={form.control}
                   render={({ field }) => (
                     <FormItem className="space-y-0">
@@ -259,7 +296,7 @@ export function RegisterForm({
                 />
 
                 <FormField
-                  name="confirm-old"
+                  name="confirmOld"
                   control={form.control}
                   render={({ field }) => (
                     <FormItem className="space-y-0">
@@ -279,7 +316,14 @@ export function RegisterForm({
                   )}
                 />
 
-                <Button type="submit" className="w-full">
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={form.formState.isSubmitting}
+                >
+                  {form.formState.isSubmitting && (
+                    <Loader className="animate-spin" />
+                  )}{" "}
                   Inscription
                 </Button>
 
@@ -298,7 +342,6 @@ export function RegisterForm({
           <div className="relative hidden bg-muted md:block">
             <AuthImage
               alt=""
-              placeholder="empty"
               className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
             />
           </div>

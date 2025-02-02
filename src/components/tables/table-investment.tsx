@@ -1,7 +1,5 @@
 "use client";
 
-import * as React from "react";
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChevronRight, Inbox } from "lucide-react";
 import {
@@ -24,50 +22,33 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Transaction, TransactionSummary } from "@/types";
+import { useEffect, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 
-const data: Payment[] = [
-  {
-    id: "m5gr84i9",
-    amount: 316,
-    status: "success",
-  },
-  {
-    id: "3u1reuv4",
-    amount: 242,
-    status: "success",
-  },
-  {
-    id: "derv1ws0",
-    amount: 837,
-    status: "processing",
-  },
-  {
-    id: "5kma53ae",
-    amount: 874,
-    status: "success",
-  },
-  {
-    id: "bhqecj4p",
-    amount: 721,
-    status: "failed",
-  },
-];
-
-export type Payment = {
-  id: string;
-  amount: number;
-  status: "pending" | "processing" | "success" | "failed";
-};
-
-export const columns: ColumnDef<Payment>[] = [
+export const columns: ColumnDef<Transaction>[] = [
   {
     accessorKey: "id",
     header: () => <div className="text-left">ID</div>,
-    cell: ({ row }) => <div className="lowercase">{row.getValue("id")}</div>,
+    cell: ({ row }) => <div className="capitalize">{row.getValue("id")}</div>,
+  },
+  {
+    accessorKey: "type",
+    header: () => <div className="text-left">Type</div>,
+    cell: ({ row }) => {
+      const type = row.getValue("type");
+      const frenchType =
+        type === "investment"
+          ? "Investissement"
+          : type === "deposit"
+          ? "Dépôt"
+          : "Retrait";
+      return <div className="capitalize">{frenchType}</div>;
+    },
   },
   {
     accessorKey: "status",
@@ -75,15 +56,23 @@ export const columns: ColumnDef<Payment>[] = [
     cell: ({ row }) => (
       <Badge
         variant="outline"
-        className={cn("capitalize", {
+        className={cn({
           "border-green-400 text-green-400":
             row.getValue("status") === "success",
           "border-amber-400 text-amber-400":
-            row.getValue("status") === "processing",
-          "border-red-400 text-red-400": row.getValue("status") === "failed",
+            row.getValue("status") === "pending",
+          "border-red-400 text-red-400":
+            row.getValue("status") === "rejected" ||
+            row.getValue("status") === "expired",
         })}
       >
-        {row.getValue("status")}
+        {row.getValue("status") === "success"
+          ? "Succès"
+          : row.getValue("status") === "pending"
+          ? "En cours..."
+          : row.getValue("status") === "rejected"
+          ? "Rejeté"
+          : "Expiré"}
       </Badge>
     ),
   },
@@ -104,19 +93,32 @@ export const columns: ColumnDef<Payment>[] = [
   },
 ];
 
-export function TableInvestment() {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
+type TableInvestmentprops = {
+  transactions?: TransactionSummary;
+};
+
+export function TableInvestment(props: TableInvestmentprops) {
+  const { transactions } = props;
+  const [data, setData] = useState<Transaction[]>([]);
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = useState({});
+
+  useEffect(() => {
+    if (transactions?.transactions) {
+      setData(transactions.transactions);
+    }
+  }, [transactions]);
 
   const table = useReactTable({
     data,
-    // data: [],
     columns,
+    initialState: {
+      pagination: {
+        pageSize: 11,
+      },
+    },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -139,9 +141,11 @@ export function TableInvestment() {
         <CardTitle className="text-lg font-bold">
           Historique des transactions
         </CardTitle>
-        <Button variant="outline" size="sm">
-          Voir tout
-          <ChevronRight className="-mr-1.5" />
+        <Button variant="outline" size="sm" asChild>
+          <Link href="/dashboard/historical">
+            Voir tout
+            <ChevronRight className="-mr-1.5" />
+          </Link>
         </Button>
       </CardHeader>
       <CardContent>
@@ -182,7 +186,7 @@ export function TableInvestment() {
                 </TableRow>
               ))
             ) : (
-              <TableRow className="h-[50vh]">
+              <TableRow className="h-[48vh]">
                 <TableCell
                   colSpan={columns.length}
                   className="text-center hover:bg-white"

@@ -4,9 +4,11 @@ import * as React from "react";
 
 import {
   BadgeDollarSign,
+  HandCoins,
   History,
   LayoutDashboard,
   LifeBuoy,
+  Lock,
   Package,
   Send,
 } from "lucide-react";
@@ -19,24 +21,27 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { useEffect, useState } from "react";
 
 import Link from "next/link";
 import { Logo } from "@/assets/images";
+import { NavAdmin } from "./nav-admin";
 import { NavMain } from "@/components/sidebar/nav-main";
 import { NavSecondary } from "@/components/sidebar/nav-secondary";
 import { NavUser } from "@/components/sidebar/nav-user";
+import { UserInfo } from "@/types";
 
 const data = {
-  user: {
-    sex: "M",
-    name: "Jean marc",
-    email: "m@example.com",
-  },
   navMain: [
     {
       title: "Dashborad",
       url: "/dashboard",
       icon: LayoutDashboard,
+    },
+    {
+      title: "Finance",
+      url: "/dashboard/finance",
+      icon: HandCoins,
     },
     {
       title: "Pack d'investissements",
@@ -62,13 +67,51 @@ const data = {
     },
     {
       title: "Support",
-      url: "#",
+      url: "/dashboard/support",
       icon: LifeBuoy,
+    },
+  ],
+
+  navAdmin: [
+    {
+      title: "Dashboard admin",
+      url: "/dashboard/admin",
+      icon: Lock,
+    },
+    {
+      title: "Admin transactions",
+      url: "/dashboard/admin/transactions",
+      icon: Lock,
     },
   ],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const [user, setUser] = useState<UserInfo | undefined>(undefined);
+
+  const fetchUserInfo = async () => {
+    try {
+      const response = await fetch("/api/auth/me");
+
+      const json = await response.json();
+
+      if (json?.state) {
+        setUser(json?.data);
+      }
+    } catch (err: any) {}
+  };
+
+  useEffect(() => {
+    fetchUserInfo();
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("user-info-updated", fetchUserInfo);
+    return () => {
+      window.removeEventListener("user-info-updated", fetchUserInfo);
+    };
+  }, []);
+
   return (
     <Sidebar variant="inset" {...props}>
       <SidebarHeader>
@@ -86,10 +129,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+        <div className="mt-auto">
+          {user?.role === "admin" ? (
+            <>
+              <NavAdmin items={data.navAdmin} />
+              <div className="mt-2" />
+            </>
+          ) : null}
+          <NavSecondary items={data.navSecondary} />
+        </div>
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={user} />
       </SidebarFooter>
     </Sidebar>
   );

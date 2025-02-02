@@ -6,29 +6,85 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Pack1, Pack2, Pack3 } from "@/assets/images/pack";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 import { Button } from "@/components/ui/button";
 import { CheckBroken } from "@/assets/svg";
 import { ChevronsUpDown } from "lucide-react";
-import { Label } from "@/components/ui/label";
-import NumberFlow from "@number-flow/react";
+import { PackDetail } from "@/types";
+import { PackForm } from "@/components/form/pack-form";
+import { collection } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import { useCollectionOnce } from "react-firebase-hooks/firestore";
+import { useSnackbar } from "notistack";
 
 export default function Pack() {
+  const { enqueueSnackbar } = useSnackbar();
+  const [packs] = useCollectionOnce(collection(db, "packs"));
+
+  async function souscribe(pack: PackDetail, name: string, id: string) {
+    try {
+      const response = await fetch("/api/transactions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          amount: pack.amount,
+          type: "investment",
+          pack: {
+            id: id,
+            name: name,
+            roi: pack.roi,
+            amount: pack.amount,
+            number_of_day: pack.number_of_day,
+          },
+          status: "pending",
+        }),
+      });
+
+      const json = await response.json();
+
+      if (json?.state) {
+        enqueueSnackbar("Votre investissement a été effectué avec succès !", {
+          variant: "success",
+          preventDuplicate: true,
+          autoHideDuration: 3000,
+          anchorOrigin: { vertical: "top", horizontal: "center" },
+        });
+      } else {
+        enqueueSnackbar(
+          "Une erreur s'est produite lors de votre investissement. Veuillez réessayer.",
+          {
+            variant: "error",
+            preventDuplicate: true,
+            autoHideDuration: 3000,
+            anchorOrigin: { vertical: "top", horizontal: "center" },
+          }
+        );
+        throw Error("Error while creating the transaction");
+      }
+    } catch (error) {}
+  }
+
+  function printPackForm(name: string) {
+    const pack = packs?.docs.find((doc) => doc.data().name === name);
+    return pack ? (
+      <PackForm
+        data={pack.data().details}
+        onClick={async (packDetail) => {
+          await souscribe(packDetail, pack.data().name, pack.id);
+        }}
+      />
+    ) : null;
+  }
+
   return (
     <section>
       <div className="">
         <div className="flex flex-col md:flex-row justify-between items-start md:gap-2 gap-8">
           <div className="w-full flex-1 shadow-custom rounded-lg">
             <div className="bg-primary px-4 py-2 rounded-t-lg">
-              <h1 className="text-xl text-white font-bold">Pack Starter</h1>
+              <h1 className="text-xl text-white font-bold">Pack Start</h1>
             </div>
             <div className="bg-primary">
               <Pack1 alt="" className="p-1" />
@@ -71,51 +127,7 @@ export default function Pack() {
                   </Button>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                  <div className="border-t-2 border-primary pt-3 mt-3 grid gap-2">
-                    <div className="grid gap-2">
-                      <Label>Durée</Label>
-                      <Select>
-                        <SelectTrigger className="w-full">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectItem value="H">Homme</SelectItem>
-                            <SelectItem value="F">Femme</SelectItem>
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="grid gap-2">
-                      <Label>Montant</Label>
-                      <Select>
-                        <SelectTrigger className="w-full">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectItem value="H">Homme</SelectItem>
-                            <SelectItem value="F">Femme</SelectItem>
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="grid gap-2">
-                      <Label>RSI</Label>
-                      <div className="w-full p-1 flex justify-center items-center rounded-xl border-2 border-primary border-dashed">
-                        <NumberFlow
-                          value={100000}
-                          format={{
-                            style: "currency",
-                            currency: "XOF",
-                            trailingZeroDisplay: "stripIfInteger",
-                          }}
-                          className="text-primary text-xl font-bold"
-                        />
-                      </div>
-                    </div>
-                    <Button className="w-full mt-2">Valider</Button>
-                  </div>
+                  {printPackForm("pack start")}
                 </CollapsibleContent>
               </Collapsible>
             </div>
@@ -165,51 +177,7 @@ export default function Pack() {
                   </Button>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                  <div className="border-t-2 border-primary pt-3 mt-3 grid gap-2">
-                    <div className="grid gap-2">
-                      <Label>Durée</Label>
-                      <Select>
-                        <SelectTrigger className="w-full">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectItem value="H">Homme</SelectItem>
-                            <SelectItem value="F">Femme</SelectItem>
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="grid gap-2">
-                      <Label>Montant</Label>
-                      <Select>
-                        <SelectTrigger className="w-full">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectItem value="H">Homme</SelectItem>
-                            <SelectItem value="F">Femme</SelectItem>
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="grid gap-2">
-                      <Label>RSI</Label>
-                      <div className="w-full p-1 flex justify-center items-center rounded-xl border-2 border-primary border-dashed">
-                        <NumberFlow
-                          value={100000}
-                          format={{
-                            style: "currency",
-                            currency: "XOF",
-                            trailingZeroDisplay: "stripIfInteger",
-                          }}
-                          className="text-primary text-xl font-bold"
-                        />
-                      </div>
-                    </div>
-                    <Button className="w-full mt-2">Valider</Button>
-                  </div>
+                  {printPackForm("pack premium")}
                 </CollapsibleContent>
               </Collapsible>
             </div>
@@ -259,51 +227,7 @@ export default function Pack() {
                   </Button>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                  <div className="border-t-2 border-primary pt-3 mt-3 grid gap-2">
-                    <div className="grid gap-2">
-                      <Label>Durée</Label>
-                      <Select>
-                        <SelectTrigger className="w-full">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectItem value="H">Homme</SelectItem>
-                            <SelectItem value="F">Femme</SelectItem>
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="grid gap-2">
-                      <Label>Montant</Label>
-                      <Select>
-                        <SelectTrigger className="w-full">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectItem value="H">Homme</SelectItem>
-                            <SelectItem value="F">Femme</SelectItem>
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="grid gap-2">
-                      <Label>RSI</Label>
-                      <div className="w-full p-1 flex justify-center items-center rounded-xl border-2 border-primary border-dashed">
-                        <NumberFlow
-                          value={100000}
-                          format={{
-                            style: "currency",
-                            currency: "XOF",
-                            trailingZeroDisplay: "stripIfInteger",
-                          }}
-                          className="text-primary text-xl font-bold"
-                        />
-                      </div>
-                    </div>
-                    <Button className="w-full mt-2">Valider</Button>
-                  </div>
+                  {printPackForm("pack business")}
                 </CollapsibleContent>
               </Collapsible>
             </div>

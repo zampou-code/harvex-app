@@ -1,2 +1,2 @@
-export { TableCodchildren } from "./table-godchildren";
+export { TableGodchildren } from "./table-godchildren";
 export { TableInvestment } from "./table-investment";

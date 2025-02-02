@@ -25,18 +25,32 @@ import {
 } from "@/components/ui/sidebar";
 import { man, woman } from "@/assets/images/pp";
 
+import { KYCBadge } from "@/assets/images";
 import Link from "next/link";
+import React from "react";
+import { Skeleton } from "../ui/skeleton";
+import { UserInfo } from "@/types";
+import { useRouter } from "next/navigation";
 
-export function NavUser({
-  user,
-}: {
-  user: {
-    name: string;
-    email: string;
-    sex: "M" | "F" | string;
-  };
-}) {
+type NavUserProps = {
+  user?: UserInfo;
+};
+
+export function NavUser(props: NavUserProps) {
+  const { user } = props;
+  const router = useRouter();
   const { isMobile } = useSidebar();
+
+  async function logOut() {
+    try {
+      const res = await fetch("/api/auth/logout");
+      const json = await res.json();
+
+      if (json?.state) {
+        router.push("/");
+      }
+    } catch (error) {}
+  }
 
   return (
     <SidebarMenu>
@@ -47,17 +61,40 @@ export function NavUser({
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage
-                  alt={user.name}
-                  className="bg-primary object-contain p-1"
-                  src={user.sex === "M" ? man.src : woman.src}
-                />
-                <AvatarFallback className="rounded-lg">HG</AvatarFallback>
-              </Avatar>
+              {user ? (
+                <>
+                  {user?.kyc?.status === "approved" && (
+                    <div className="absolute top-0 left-0 w-5 h-5 z-20">
+                      <KYCBadge
+                        alt=""
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                  )}
+                  <Avatar className="h-8 w-8 rounded-lg">
+                    <AvatarImage
+                      alt={user?.firstname}
+                      className="bg-primary object-contain p-1"
+                      src={user.sex === "M" ? man.src : woman.src}
+                    />
+                    <AvatarFallback className="rounded-lg">HG</AvatarFallback>
+                  </Avatar>
+                </>
+              ) : (
+                <Skeleton className="h-8 w-8 rounded-lg" />
+              )}
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{user.name}</span>
-                <span className="truncate text-xs">{user.email}</span>
+                {user ? (
+                  <>
+                    <span className="truncate font-semibold">{`${user.firstname} ${user.lastname}`}</span>
+                    <span className="truncate text-xs">{user.email}</span>
+                  </>
+                ) : (
+                  <>
+                    <Skeleton className="w-full h-2 mb-2.5" />
+                    <Skeleton className="w-full h-2" />
+                  </>
+                )}
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -70,16 +107,40 @@ export function NavUser({
           >
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage
-                    alt={user.name}
-                    className="bg-primary object-contain p-1"
-                    src={user.sex === "M" ? man.src : woman.src}
-                  />
-                </Avatar>
+                {user ? (
+                  <>
+                    {user?.kyc?.status === "approved" && (
+                      <div className="absolute top-1 left-1 w-5 h-5 z-20">
+                        <KYCBadge
+                          alt=""
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                    )}
+                    <Avatar className="h-8 w-8 rounded-lg">
+                      <AvatarImage
+                        alt={user?.firstname}
+                        className="bg-primary object-contain p-1"
+                        src={user.sex === "M" ? man.src : woman.src}
+                      />
+                      <AvatarFallback className="rounded-lg">HG</AvatarFallback>
+                    </Avatar>
+                  </>
+                ) : (
+                  <Skeleton className="h-8 w-8 rounded-lg" />
+                )}
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">{user.name}</span>
-                  <span className="truncate text-xs">{user.email}</span>
+                  {user ? (
+                    <>
+                      <span className="truncate font-semibold">{`${user.firstname} ${user.lastname}`}</span>
+                      <span className="truncate text-xs">{user.email}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Skeleton className="w-full h-2 mb-2.5" />
+                      <Skeleton className="w-full h-2" />
+                    </>
+                  )}
                 </div>
               </div>
             </DropdownMenuLabel>
@@ -107,7 +168,7 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer">
+            <DropdownMenuItem onClick={logOut} className="cursor-pointer">
               <LogOut />
               Deconnexion
             </DropdownMenuItem>

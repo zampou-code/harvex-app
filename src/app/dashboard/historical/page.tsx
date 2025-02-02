@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -11,12 +13,32 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { useEffect, useState } from "react";
 
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import { Separator } from "@/components/ui/separator";
 import { TableHistoricalInvestment } from "@/components/tables/table-historical-investment";
+import { Transaction } from "@/types";
 
 export default function Page() {
+  const [investments, setInvestments] = useState<Transaction[]>([]);
+
+  useEffect(() => {
+    const fetchInvestments = async () => {
+      try {
+        const response = await fetch("/api/transactions");
+
+        const json = await response.json();
+
+        if (json?.state) {
+          setInvestments(json.data);
+        }
+      } catch (error) {}
+    };
+
+    fetchInvestments();
+  }, []);
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -40,7 +62,7 @@ export default function Page() {
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 lg:px-10 pt-0">
           <h2 className="text-sm font-bold">Historiques</h2>
-          <TableHistoricalInvestment />
+          <TableHistoricalInvestment transactions={investments} />
         </div>
       </SidebarInset>
     </SidebarProvider>

@@ -2,6 +2,7 @@ import "./globals.css";
 
 import { Inter } from "next/font/google";
 import type { Metadata } from "next";
+import { ProvidersLayout } from "@/components/pages/providers-layout";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -23,7 +24,7 @@ export default function RootLayout({
         suppressHydrationWarning={true}
         className={`${inter.className} antialiased`}
       >
-        {children}
+        <ProvidersLayout>{children}</ProvidersLayout>
       </body>
     </html>
   );

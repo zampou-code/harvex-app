@@ -59,7 +59,7 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="sticky top-0 left-0 z-20 flex items-center justify-between px-7 sm:px-10 lg:px-10 xl:px-36 py-6 bg-white dark:bg-gray-800">
+    <nav className="sticky w-full top-0 left-0 z-20 flex items-center justify-between px-7 sm:px-10 lg:px-10 xl:px-36 py-6 bg-white dark:bg-gray-800">
       <Link
         to="/"
         spy={true}
