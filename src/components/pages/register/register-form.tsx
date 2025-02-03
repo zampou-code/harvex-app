@@ -129,7 +129,7 @@ export function RegisterForm({
         headers: {
           Accept: "application/json",
         },
-        body: JSON.stringify({ values, referral_id: referralId || "" }),
+        body: JSON.stringify({ ...values, referral_id: referralId || "" }),
       });
 
       const json = await res.json();

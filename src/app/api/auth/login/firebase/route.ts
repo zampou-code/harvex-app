@@ -7,6 +7,7 @@ export async function POST(request: Request) {
     const { email, password } = await request?.json();
     const user = await signInWithEmailAndPassword(auth, email, password);
 
+    console.log(user);
     return NextResponse.json(
       {
         state: true,

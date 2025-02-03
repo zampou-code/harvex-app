@@ -25,6 +25,17 @@ export async function POST(request: Request) {
 
     const userId = userCredential.user.uid;
 
+    if (!userId)
+      return NextResponse.json(
+        {
+          state: true,
+          data: {
+            message: "An error occurred during register. Please try again.",
+          },
+        },
+        { status: 200 }
+      );
+
     await db
       .collection("users")
       .doc(userId)

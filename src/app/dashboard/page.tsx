@@ -32,7 +32,7 @@ export default function Page() {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const response = await fetch("/api/dashboard-data");
+        const response = await fetch("/api/dashboard");
 
         const json = await response.json();
 
