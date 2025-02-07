@@ -35,7 +35,6 @@ export function CardInvestmentDetails(props: CardInvestmentDetailsProps) {
           setRemainingDays(json?.data?.remaining_days || 0);
         }
       } catch (error) {
-        console.log(error);
         setRemainingDays(0);
       }
     }
@@ -125,8 +124,8 @@ export function CardInvestmentDetails(props: CardInvestmentDetailsProps) {
             <Button className="flex-1">Ajouter a mon compte</Button>
           ) : (
             <Button
-              className="flex-1 bg-slate-200 shadow-none text-black"
               disabled
+              className="flex-1 bg-slate-200 shadow-none text-black"
             >
               En cours...
             </Button>

@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Element } from "react-scroll";
 import { Input } from "@/components/ui/input";
+import { Send } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -53,7 +54,7 @@ export default function Contacts() {
   }
 
   return (
-    <Element name="contacts" as="section">
+    <Element name="contacts" id="contacts" as="section">
       <div className="relative w-full h-[708px]">
         <iframe
           loading="lazy"
@@ -118,13 +119,18 @@ export default function Contacts() {
                     <FormItem>
                       <FormLabel>Message</FormLabel>
                       <FormControl>
-                        <Textarea placeholder="message" {...field} />
+                        <Textarea
+                          {...field}
+                          placeholder="message"
+                          className="resize-none"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
                 <Button type="submit" className="w-full mt-4">
+                  <Send />
                   Envoyer
                 </Button>
               </form>

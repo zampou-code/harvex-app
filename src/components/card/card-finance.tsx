@@ -119,8 +119,8 @@ export function CardFinance(props: CardFinanceProps) {
 
       if (json?.state) {
         enqueueSnackbar(json?.message, {
+          persist: true,
           variant: "success",
-          preventDuplicate: true,
           anchorOrigin: { vertical: "top", horizontal: "center" },
           action: (snackbarId) => (
             <>

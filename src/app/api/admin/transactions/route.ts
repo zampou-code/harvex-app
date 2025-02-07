@@ -7,141 +7,133 @@ export const POST = auth(async function POST(request) {
     return NextResponse.json({ message: "Non authentifié" }, { status: 401 });
 
   try {
-    const user_id = request.auth.user?.id;
-    const { transaction, action, status } = await request.json();
+    const { user } = request.auth;
 
-    if (!user_id)
+    if (!user?.id) {
       return NextResponse.json({ message: "Non authentifié" }, { status: 401 });
-
-    const userDoc = await db.collection("users").doc(user_id).get();
-
-    if (!userDoc.exists) {
-      return NextResponse.json(
-        { error: "Non autorisé", state: false },
-        { status: 403 }
-      );
     }
 
-    const userData = userDoc.data();
-
-    if (userData?.role === "user") {
-      return NextResponse.json(
-        { error: "Non autorisé", state: false },
-        { status: 403 }
-      );
-    }
-
-    if (action === "update" && transaction && status) {
-      await db
-        .collection("transactions")
-        .where("id", "==", transaction.id)
+    const [userDoc, userData] = await Promise.all([
+      db.collection("users").doc(user.id).get(),
+      db
+        .collection("users")
+        .doc(user.id)
         .get()
-        .then(async (querySnapshot) => {
-          for (const doc of querySnapshot.docs) {
-            const transactionData = doc.data();
+        .then((doc) => doc.data()),
+    ]);
 
-            const handleWithdrawal = async () => {
-              const accountSnapshot = await db
-                .collection("accounts")
-                .where("user_id", "==", transactionData.user_id)
-                .get();
-
-              if (!accountSnapshot.empty) {
-                const accountDoc = accountSnapshot.docs[0];
-                const accountData = accountDoc.data();
-
-                if (accountData.main.amount < transactionData.amount) {
-                  throw new Error(
-                    "Solde insuffisant pour effectuer le retrait"
-                  );
-                }
-
-                const newMainBalance =
-                  accountData.main.amount - transactionData.amount;
-                await accountDoc.ref.update({ "main.amount": newMainBalance });
-              }
-            };
-
-            const handleDeposit = async () => {
-              const accountSnapshot = await db
-                .collection("accounts")
-                .where("user_id", "==", transactionData.user_id)
-                .get();
-
-              if (!accountSnapshot.empty) {
-                const accountDoc = accountSnapshot.docs[0];
-                const accountData = accountDoc.data();
-
-                const newMainBalance =
-                  accountData.main.amount + transactionData.amount;
-                await accountDoc.ref.update({ "main.amount": newMainBalance });
-
-                const userDoc = await db
-                  .collection("users")
-                  .doc(transactionData.user_id)
-                  .get();
-
-                if (userDoc.exists) {
-                  const referralCode = userDoc.data()?.referral_id;
-
-                  if (referralCode) {
-                    const referrerSnapshot = await db
-                      .collection("users")
-                      .where("referral_code", "==", referralCode)
-                      .get();
-
-                    if (!referrerSnapshot.empty) {
-                      const referrerDoc = referrerSnapshot.docs[0];
-                      const referrerAccountSnapshot = await db
-                        .collection("accounts")
-                        .where("user_id", "==", referrerDoc.id)
-                        .get();
-
-                      if (!referrerAccountSnapshot.empty) {
-                        const referrerAccountDoc =
-                          referrerAccountSnapshot.docs[0];
-                        const referrerAccountData = referrerAccountDoc.data();
-                        const affiliateBonus = transactionData.amount * 0.03;
-                        const newAffiliateBalance =
-                          referrerAccountData.affiliate.amount + affiliateBonus;
-                        await referrerAccountDoc.ref.update({
-                          "affiliate.amount": newAffiliateBalance,
-                        });
-                      }
-                    }
-                  }
-                }
-              }
-            };
-
-            if (status === "success") {
-              if (transactionData.type === "withdraw") {
-                await handleWithdrawal();
-              } else if (transactionData.type === "deposit") {
-                await handleDeposit();
-              }
-            }
-
-            await doc.ref.update({ status: status });
-          }
-        });
+    if (!userDoc.exists || userData?.role !== "admin") {
       return NextResponse.json(
-        { state: true, message: "Statut de la transaction mis à jour" },
-        { status: 200 }
+        { error: "Non autorisé", state: false },
+        { status: 403 }
       );
-    } else if (action === "transaction") {
+    }
+
+    const { type, status, transaction } = await request.json();
+
+    if (type === "delete-transaction" && transaction) {
       await db.collection("transactions").doc(transaction.id).delete();
 
       return NextResponse.json(
-        { state: true, message: "Transaction supprimée" },
+        { message: "Transaction supprimée avec succès", state: true },
         { status: 200 }
       );
-    } else {
+    }
+
+    if (type === "update-transaction-satuts" && transaction && status) {
+      await db
+        .collection("transactions")
+        .doc(transaction.doc_id)
+        .update({ status });
+
+      if (transaction.type === "investment" && status === "approved") {
+        const userSnapshot = await db
+          .collection("users")
+          .doc(transaction.user_id)
+          .get();
+
+        if (userSnapshot.exists) {
+          const userData = userSnapshot.data();
+          const referralCode = userData?.referral_code;
+
+          if (referralCode) {
+            const referrerSnapshot = await db
+              .collection("users")
+              .where("referral_code", "==", referralCode)
+              .get();
+
+            if (!referrerSnapshot.empty) {
+              const referrerDoc = referrerSnapshot.docs[0];
+              const referrerId = referrerDoc.id;
+
+              const bonusAmount = transaction.amount * 0.03;
+
+              await db
+                .collection("accounts")
+                .where("user_id", "==", referrerId)
+                .get()
+                .then(async (accountSnapshot) => {
+                  if (!accountSnapshot.empty) {
+                    const accountDoc = accountSnapshot.docs[0];
+                    const accountData = accountDoc.data();
+
+                    await db
+                      .collection("accounts")
+                      .doc(accountDoc.id)
+                      .update({
+                        affiliate: {
+                          ...accountData.affiliate,
+                          amount: accountData.affiliate.amount + bonusAmount,
+                        },
+                      });
+                  }
+                });
+            }
+          }
+        }
+      }
+
+      if (transaction.type === "withdraw" && status === "approved") {
+        const accountSnapshot = await db
+          .collection("accounts")
+          .where("user_id", "==", transaction.user_id)
+          .get();
+
+        if (!accountSnapshot.empty) {
+          const accountDoc = accountSnapshot.docs[0];
+          const accountData = accountDoc.data();
+
+          await db
+            .collection("accounts")
+            .doc(accountDoc.id)
+            .update({
+              [transaction.account]: {
+                ...accountData[transaction.account],
+                amount:
+                  accountData[transaction.account].amount - transaction.amount,
+              },
+            });
+        }
+      }
+
       return NextResponse.json(
-        { state: false, message: "Action non valide" },
-        { status: 400 }
+        {
+          state: true,
+          message:
+            "Le statut de la transaction d'investissement a été mis à jour avec succès.",
+        },
+        { status: 200 }
       );
     }
+
+    return NextResponse.json(
+      {
+        state: false,
+        message:
+          "Une erreur s'est produite lors de la mise à jour du statut de la transaction.",
+      },
+      { status: 200 }
+    );
   } catch (error) {
     console.log(error);
     return NextResponse.json(

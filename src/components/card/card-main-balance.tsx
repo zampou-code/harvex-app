@@ -7,12 +7,12 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { AccountBalance, UserKYC } from "@/types";
-import NumberFlow from "@number-flow/react";
-import { BadgeDollarSign } from "lucide-react";
 import { Line, LineChart } from "recharts";
-import { Skeleton } from "@/components/ui/skeleton";
 import { KYCBadge } from "@/assets/images";
+import NumberFlow from "@number-flow/react";
+import { AccountBalance, UserKYC } from "@/types";
+import { Skeleton } from "@/components/ui/skeleton";
+import { DialogMainBalanceWithdraw } from "@/components/dialog/dialog-main-balance-withdraw";
 
 const data = [
   {
@@ -64,7 +64,7 @@ export function CardMainBalance(props: CardMainBalanceProps) {
           </div>
         )}
         <CardTitle className="text-sm font-bold">Solde principal</CardTitle>
-        <BadgeDollarSign className="h-4 w-4 text-muted-foreground" />
+        <DialogMainBalanceWithdraw account={props} />
       </CardHeader>
       <CardContent className="pb-0">
         {account ? (

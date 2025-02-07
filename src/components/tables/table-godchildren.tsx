@@ -15,6 +15,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import { Frown, Loader } from "lucide-react";
 import { Referrals, UserInfo } from "@/types";
 import {
   Table,
@@ -25,8 +26,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useEffect, useState } from "react";
-
-import { Frown } from "lucide-react";
 
 export const columns: ColumnDef<UserInfo>[] = [
   {
@@ -55,11 +54,12 @@ export const columns: ColumnDef<UserInfo>[] = [
 ];
 
 type TableGodchildrenProps = {
+  loading?: boolean;
   referrals?: Referrals;
 };
 
 export function TableGodchildren(props: TableGodchildrenProps) {
-  const { referrals } = props;
+  const { loading, referrals } = props;
   const [data, setData] = useState<UserInfo[]>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -148,8 +148,17 @@ export function TableGodchildren(props: TableGodchildrenProps) {
                   colSpan={columns.length}
                   className="text-center hover:bg-white pt-10"
                 >
-                  <Frown className="mx-auto" />
-                  <p>Pas encore de filleules</p>
+                  {loading ? (
+                    <div className="flex flex-col items-center gap-2">
+                      <Loader className="mx-auto animate-spin" />
+                      <p>Chargement des filleules...</p>
+                    </div>
+                  ) : data.length ? null : (
+                    <div className="flex flex-col items-center gap-2">
+                      <Frown className="mx-auto" />
+                      <p>Pas encore de filleules</p>
+                    </div>
+                  )}
                 </TableCell>
               </TableRow>
             )}

@@ -6,7 +6,7 @@ import { Element } from "react-scroll";
 
 export default function AboutUs() {
   return (
-    <Element name="about-us" as="section" className="bg-white">
+    <Element name="about-us" id="about-us" as="section" className="bg-white">
       <div className="md:flex gap-10 justify-between items-center responvive-p-x py-16">
         <div className="flex gap-2 md:gap-5 md:w-96">
           <div className="w-1/2 mb-10 space-y-2 md:space-y-5">

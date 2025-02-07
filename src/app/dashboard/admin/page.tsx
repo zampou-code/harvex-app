@@ -1,5 +1,6 @@
 "use client";
 
+import { AccountBalance, Transaction, UserInfo } from "@/types";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -9,6 +10,10 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import {
+  DashbordAdminData,
+  TableAdminUsers,
+} from "@/components/tables/table-admin-users";
+import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
@@ -17,33 +22,36 @@ import { useEffect, useState } from "react";
 
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import { Separator } from "@/components/ui/separator";
-import { TableAdminUsers } from "@/components/tables/table-admin-users";
-import { UserInfo } from "@/types";
 
 export default function Page() {
-  const [users, setUsers] = useState<UserInfo[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [dashbordAdminData, setDashbordAdminData] = useState<
+    DashbordAdminData[]
+  >([]);
 
-  const fetchUsers = async () => {
+  const fetchDashbordAdminData = async () => {
     try {
+      setLoading(true);
       const response = await fetch("/api/admin/users");
 
       const json = await response.json();
 
       if (json?.state) {
-        setUsers(json.data);
+        setDashbordAdminData(json.data);
       }
     } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchUsers();
+    fetchDashbordAdminData();
   }, []);
 
   useEffect(() => {
-    window.addEventListener("user-admin-updated", fetchUsers);
+    window.addEventListener("user-admin-updated", fetchDashbordAdminData);
     return () => {
-      window.removeEventListener("user-admin-updated", fetchUsers);
+      window.removeEventListener("user-admin-updated", fetchDashbordAdminData);
     };
   }, []);
 
@@ -70,7 +78,10 @@ export default function Page() {
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 lg:px-10 pt-0">
           <h2 className="text-sm font-bold">Dashboard admin</h2>
-          <TableAdminUsers users={users} />
+          <TableAdminUsers
+            loading={loading}
+            dashboardData={dashbordAdminData}
+          />
         </div>
       </SidebarInset>
     </SidebarProvider>

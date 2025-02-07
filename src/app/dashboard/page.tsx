@@ -25,25 +25,36 @@ import { DashboardData } from "@/types";
 import { Separator } from "@/components/ui/separator";
 
 export default function Page() {
+  const [loading, setLoading] = useState<boolean>(true);
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(
     null
   );
 
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        const response = await fetch("/api/dashboard");
+  const fetchDashboardData = async () => {
+    setLoading(true);
 
-        const json = await response.json();
+    try {
+      const response = await fetch("/api/dashboard");
 
-        if (json?.state) {
-          setDashboardData(json?.data);
-        }
-      } finally {
+      const json = await response.json();
+
+      if (json?.state) {
+        setDashboardData(json?.data);
       }
-    };
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchDashboardData();
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("dashboard-data-updated", fetchDashboardData);
+    return () => {
+      window.removeEventListener("dashboard-data-updated", fetchDashboardData);
+    };
   }, []);
 
   return (
@@ -77,11 +88,17 @@ export default function Page() {
           </div>
           <div className="grid auto-rows-min gap-4 md:grid-cols-12">
             <div className="md:col-span-7 rounded-xl md:min-h-min">
-              <TableInvestment transactions={dashboardData?.transactions} />
+              <TableInvestment
+                loading={loading}
+                transactions={dashboardData?.transactions}
+              />
             </div>
             <div className="md:col-span-5 rounded-xl md:min-h-min">
               <div className="rounded-xl mb-4">
-                <TableGodchildren referrals={dashboardData?.referrals} />
+                <TableGodchildren
+                  loading={loading}
+                  referrals={dashboardData?.referrals}
+                />
               </div>
               <div className="rounded-xl">
                 <CardRSICalculator />

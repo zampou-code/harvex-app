@@ -1,5 +1,8 @@
-import Link from "next/link";
+"use client";
+
+import { Link } from "react-scroll";
 import { Logo } from "@/assets/images";
+import NextLink from "next/link";
 import { Telegram } from "@/assets/svg";
 
 export default function Footer() {
@@ -15,23 +18,35 @@ export default function Footer() {
               <h2 className="text-lg font-bold mb-2">Menu</h2>
               <div className="flex flex-col gap-1">
                 <Link
-                  href="#"
-                  prefetch={false}
-                  className="text-base hover:underline underline-offset-4 hover:text-primary"
+                  to="home"
+                  spy={true}
+                  offset={-80}
+                  smooth={true}
+                  duration={500}
+                  activeClass="text-primary underline"
+                  className="text-base hover:underline underline-offset-4 hover:text-primary cursor-pointer"
                 >
                   Acceuil
                 </Link>
                 <Link
-                  href="#"
-                  prefetch={false}
-                  className="text-base hover:underline underline-offset-4 hover:text-primary"
+                  spy={true}
+                  offset={-80}
+                  to="about-us"
+                  smooth={true}
+                  duration={500}
+                  activeClass="text-primary underline"
+                  className="text-base hover:underline underline-offset-4 hover:text-primary cursor-pointer"
                 >
                   À propos
                 </Link>
                 <Link
-                  href="#"
-                  prefetch={false}
-                  className="text-base hover:underline underline-offset-4 hover:text-primary"
+                  spy={true}
+                  offset={-80}
+                  smooth={true}
+                  duration={500}
+                  to="investment-plan"
+                  activeClass="text-primary underline"
+                  className="text-base hover:underline underline-offset-4 hover:text-primary cursor-pointer"
                 >
                   Plans d’investissement
                 </Link>
@@ -40,47 +55,46 @@ export default function Footer() {
             <div>
               <h2 className="text-lg font-bold mb-2">Création de compte</h2>
               <div className="flex flex-col gap-1">
-                <Link
-                  href="#"
-                  prefetch={false}
-                  className="text-base hover:underline underline-offset-4 hover:text-primary"
+                <NextLink
+                  href="/login"
+                  className="text-base hover:underline underline-offset-4 hover:text-primary cursor-pointer"
                 >
                   Connexion
-                </Link>
-                <Link
-                  href="#"
-                  prefetch={false}
-                  className="text-base hover:underline underline-offset-4 hover:text-primary"
+                </NextLink>
+                <NextLink
+                  href="/register"
+                  className="text-base hover:underline underline-offset-4 hover:text-primary cursor-pointer"
                 >
                   Inscription
-                </Link>
+                </NextLink>
               </div>
             </div>
             <div>
               <h2 className="text-lg font-bold mb-2">Création de compte</h2>
               <div className="flex flex-col gap-1">
                 <Link
-                  href="#"
-                  prefetch={false}
-                  className="text-base hover:underline underline-offset-4 hover:text-primary"
+                  to="faq"
+                  spy={true}
+                  offset={-80}
+                  smooth={true}
+                  duration={500}
+                  activeClass="text-primary underline"
+                  className="text-base hover:underline underline-offset-4 hover:text-primary cursor-pointer"
                 >
                   Faq
                 </Link>
-
-                <Link
-                  href="#"
-                  prefetch={false}
-                  className="text-base hover:underline underline-offset-4 hover:text-primary"
+                <NextLink
+                  href="/legal"
+                  className="text-base hover:underline underline-offset-4 hover:text-primary cursor-pointer"
                 >
                   Conditions générales
-                </Link>
-                <Link
-                  href="#"
-                  prefetch={false}
-                  className="text-base hover:underline underline-offset-4 hover:text-primary"
+                </NextLink>
+                <NextLink
+                  href="/legal"
+                  className="text-base hover:underline underline-offset-4 hover:text-primary cursor-pointer"
                 >
                   Politiques de confidentialté
-                </Link>
+                </NextLink>
               </div>
             </div>
           </div>
@@ -91,9 +105,9 @@ export default function Footer() {
           © 2024 <span className="text-primary font-bold">HARVEX GROUP</span>{" "}
           tout droit reservé
         </p>
-        <Link href="#" prefetch={false}>
+        <NextLink href="#" prefetch={false}>
           <Telegram />
-        </Link>
+        </NextLink>
       </div>
     </footer>
   );

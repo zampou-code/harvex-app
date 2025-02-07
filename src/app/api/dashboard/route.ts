@@ -84,7 +84,7 @@ export const GET = auth(async function GET(request) {
       },
       account: {
         main: accountData?.main?.amount || 0,
-        affiliate: accountData?.affilate?.amount || 0,
+        affiliate: accountData?.affiliate?.amount || 0,
       },
       transactions: {
         totalInvestments,
@@ -106,7 +106,6 @@ export const GET = auth(async function GET(request) {
       { status: 201 }
     );
   } catch (error) {
-    console.log(error);
     return NextResponse.json(
       {
         error,

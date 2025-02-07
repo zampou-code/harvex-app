@@ -1,3 +1,6 @@
+"use client";
+
+import { AccountBalance, UserInfo } from "@/types";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -11,12 +14,38 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { useEffect, useState } from "react";
 
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import Pack from "@/components/pages/dashboard/pack";
 import { Separator } from "@/components/ui/separator";
 
 export default function Page() {
+  const [account, setAccount] = useState<
+    | {
+        user: UserInfo;
+        account: AccountBalance;
+      }
+    | undefined
+  >(undefined);
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const response = await fetch("/api/accounts");
+
+        const json = await response.json();
+
+        if (json?.state) {
+          setAccount(json?.data);
+        }
+      } finally {
+      }
+    };
+
+    fetchUserInfo();
+  }, []);
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -40,7 +69,7 @@ export default function Page() {
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 lg:px-10 pt-0">
           <h2 className="text-sm font-bold">Pack d&apos;investissement</h2>
-          <Pack />
+          <Pack account={account} />
         </div>
       </SidebarInset>
     </SidebarProvider>

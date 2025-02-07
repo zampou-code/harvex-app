@@ -1,27 +1,70 @@
 "use client";
 
+import { AccountBalance, PackDetail, UserInfo } from "@/types";
+import { ChevronsUpDown, LifeBuoy } from "lucide-react";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Pack1, Pack2, Pack3 } from "@/assets/images/pack";
+import { closeSnackbar, enqueueSnackbar } from "notistack";
 
 import { Button } from "@/components/ui/button";
 import { CheckBroken } from "@/assets/svg";
-import { ChevronsUpDown } from "lucide-react";
-import { PackDetail } from "@/types";
+import Link from "next/link";
 import { PackForm } from "@/components/form/pack-form";
+import { Skeleton } from "@/components/ui/skeleton";
 import { collection } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useCollectionOnce } from "react-firebase-hooks/firestore";
-import { useSnackbar } from "notistack";
 
-export default function Pack() {
-  const { enqueueSnackbar } = useSnackbar();
+type PackProps = {
+  account?: { user: UserInfo; account: AccountBalance };
+};
+
+export default function Pack(props: PackProps) {
+  const { account } = props;
   const [packs] = useCollectionOnce(collection(db, "packs"));
 
-  async function souscribe(pack: PackDetail, name: string, id: string) {
+  async function souscribe(
+    pack: PackDetail & { action: "demande" | "account" },
+    name: string,
+    id: string
+  ) {
+    if (account?.user?.kyc?.status !== "approved") {
+      enqueueSnackbar(
+        "Pour effectuer un retrait, vous devez d'abord valider votre identité (KYC). Veuillez compléter la vérification KYC dans votre profil avant de poursuivre cette opération.",
+        {
+          variant: "error",
+          autoHideDuration: 5000,
+          anchorOrigin: { vertical: "top", horizontal: "center" },
+        }
+      );
+
+      return;
+    }
+
+    if (
+      account?.account?.main &&
+      pack.action === "account" &&
+      account.account.main < pack.amount
+    ) {
+      enqueueSnackbar(
+        `Solde est insuffisant pour effectuer ce retrait. Votre solde actuel est de ${new Intl.NumberFormat(
+          "fr-FR",
+          { style: "currency", currency: "XOF" }
+        ).format(account.account.main)}.`,
+        {
+          variant: "error",
+          autoHideDuration: 5000,
+          anchorOrigin: { vertical: "top", horizontal: "center" },
+        }
+      );
+
+      return;
+    }
+
     try {
       const response = await fetch("/api/transactions", {
         method: "POST",
@@ -29,8 +72,10 @@ export default function Pack() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          amount: pack.amount,
+          account: "main",
           type: "investment",
+          action: pack.action,
+          amount: pack.amount,
           pack: {
             id: id,
             name: name,
@@ -38,37 +83,44 @@ export default function Pack() {
             amount: pack.amount,
             number_of_day: pack.number_of_day,
           },
-          status: "pending",
         }),
       });
 
       const json = await response.json();
 
-      if (json?.state) {
-        enqueueSnackbar("Votre investissement a été effectué avec succès !", {
-          variant: "success",
-          preventDuplicate: true,
-          autoHideDuration: 3000,
-          anchorOrigin: { vertical: "top", horizontal: "center" },
-        });
-      } else {
-        enqueueSnackbar(
-          "Une erreur s'est produite lors de votre investissement. Veuillez réessayer.",
-          {
-            variant: "error",
-            preventDuplicate: true,
-            autoHideDuration: 3000,
-            anchorOrigin: { vertical: "top", horizontal: "center" },
-          }
-        );
-        throw Error("Error while creating the transaction");
-      }
+      enqueueSnackbar(json?.message, {
+        variant: json?.state ? "success" : "error",
+        persist: json?.state && pack.action === "demande",
+        autoHideDuration: json?.state ? undefined : 5000,
+        anchorOrigin: { vertical: "top", horizontal: "center" },
+        action:
+          json?.state && pack.action === "demande"
+            ? (snackbarId) => (
+                <>
+                  <Button
+                    className="mr-4"
+                    variant="destructive"
+                    onClick={() => closeSnackbar(snackbarId)}
+                  >
+                    Fermer
+                  </Button>
+                  <Button variant="secondary" asChild>
+                    <Link href="/dashboard/support">
+                      <LifeBuoy />
+                      Support
+                    </Link>
+                  </Button>
+                </>
+              )
+            : null,
+      });
     } finally {
     }
   }
 
   function printPackForm(name: string) {
     const pack = packs?.docs.find((doc) => doc.data().name === name);
+
     return pack ? (
       <PackForm
         data={pack.data().details}
@@ -92,8 +144,8 @@ export default function Pack() {
             </div>
             <div className="p-4 hidden md:block">
               <p className="text-xs md:text-sm">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt.
+                Idéal pour débuter, ce pack offre une introduction simple et
+                accessible au monde des investissements.
               </p>
             </div>
             <div className="bg-primary flex justify-center items-center py-2 px-4">
@@ -121,32 +173,36 @@ export default function Pack() {
               </div>
             </div>
             <div className="px-4 pb-4 md:pt-7">
-              <Collapsible>
-                <CollapsibleTrigger asChild>
-                  <Button className="w-full mb-1">
-                    Investir maintenant <ChevronsUpDown />
-                  </Button>
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  {printPackForm("pack start")}
-                </CollapsibleContent>
-              </Collapsible>
+              {account ? (
+                <Collapsible>
+                  <CollapsibleTrigger asChild>
+                    <Button className="w-full mb-1">
+                      Investir maintenant <ChevronsUpDown />
+                    </Button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    {printPackForm("pack start")}
+                  </CollapsibleContent>
+                </Collapsible>
+              ) : (
+                <Skeleton className="w-full h-9 mb-2" />
+              )}
             </div>
           </div>
           <div className="w-full flex-1 shadow-custom rounded-lg">
-            <div className="bg-primary px-4 py-2 rounded-t-lg">
+            <div className="bg-black px-4 py-2 rounded-t-lg">
               <h1 className="text-xl text-white font-bold">Pack Premiun</h1>
             </div>
-            <div className="bg-primary">
+            <div className="bg-black">
               <Pack2 alt="" className="p-1" />
             </div>
             <div className="p-4 hidden md:block">
               <p className="text-sm">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt.
+                Pour les investisseurs intermédiaires cherchant à maximiser
+                leurs rendements avec un risque modéré.
               </p>
             </div>
-            <div className="bg-primary flex justify-center items-center py-2 px-4">
+            <div className="bg-black flex justify-center items-center py-2 px-4">
               <div className="text-right">
                 <h2 className="text-white text-xl lg:text-2xl xl:text-4xl font-bold">
                   250.000 FCFA
@@ -156,14 +212,24 @@ export default function Pack() {
             </div>
             <div className="p-4 space-y-3">
               <div className="flex justify-start items-center gap-3">
-                <CheckBroken width={14} height={14} className="inline" />
+                <CheckBroken
+                  color="black"
+                  width={14}
+                  height={14}
+                  className="inline"
+                />
                 <p className="text-xs">
                   <span className="font-bold">Durées : </span>
                   10, 20 ou 30 jours
                 </p>
               </div>
               <div className="flex justify-start items-center gap-3">
-                <CheckBroken width={14} height={14} className="inline" />
+                <CheckBroken
+                  color="black"
+                  width={14}
+                  height={14}
+                  className="inline"
+                />
                 <p className="text-xs flex-1">
                   <span className="font-bold">Rendements : </span>
                   exemple concret comme 1.000.000 → 1.750.000 F CFA en 30 jours.
@@ -171,16 +237,20 @@ export default function Pack() {
               </div>
             </div>
             <div className="px-4 pb-4 md:pt-7">
-              <Collapsible>
-                <CollapsibleTrigger asChild>
-                  <Button className="w-full mb-1">
-                    Investir maintenant <ChevronsUpDown />
-                  </Button>
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  {printPackForm("pack premium")}
-                </CollapsibleContent>
-              </Collapsible>
+              {account ? (
+                <Collapsible>
+                  <CollapsibleTrigger asChild>
+                    <Button className="w-full mb-1 bg-black hover:bg-black/90">
+                      Investir maintenant <ChevronsUpDown />
+                    </Button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    {printPackForm("pack premium")}
+                  </CollapsibleContent>
+                </Collapsible>
+              ) : (
+                <Skeleton className="w-full  h-9 mb-2" />
+              )}
             </div>
           </div>
           <div className="w-full flex-1 shadow-custom rounded-lg">
@@ -192,8 +262,8 @@ export default function Pack() {
             </div>
             <div className="p-4 hidden md:block">
               <p className="text-sm">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt.
+                Conçu pour les investisseurs expérimentés souhaitant des
+                rendements élevés sur des projets à long terme.
               </p>
             </div>
             <div className="bg-primary flex justify-center items-center py-2 px-4">
@@ -221,16 +291,20 @@ export default function Pack() {
               </div>
             </div>
             <div className="px-4 pb-4 pt-2">
-              <Collapsible>
-                <CollapsibleTrigger asChild>
-                  <Button className="w-full mb-1">
-                    Investir maintenant <ChevronsUpDown />
-                  </Button>
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  {printPackForm("pack business")}
-                </CollapsibleContent>
-              </Collapsible>
+              {account ? (
+                <Collapsible>
+                  <CollapsibleTrigger asChild>
+                    <Button className="w-full mb-1">
+                      Investir maintenant <ChevronsUpDown />
+                    </Button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    {printPackForm("pack business")}
+                  </CollapsibleContent>
+                </Collapsible>
+              ) : (
+                <Skeleton className="w-full  h-9 mb-2" />
+              )}
             </div>
           </div>
         </div>

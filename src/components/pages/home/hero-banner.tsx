@@ -9,7 +9,7 @@ import Link from "next/link";
 
 export default function HeroBanner() {
   return (
-    <Element name="home" as="section" className="bg-white">
+    <Element name="home" id="home" as="section" className="bg-white">
       <div className="responvive-p-x pt-24">
         <div className="md:bg-[url('/hero-bg.png')] bg-top bg-cover bg-no-repeat flex max-md:flex-col justify-between items-center gap-10">
           <div className="w-full md:w-1/2 space-y-7">
@@ -50,8 +50,8 @@ export default function HeroBanner() {
               CHOISIR UN PACK
             </h2>
             <p className="text-xs">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt.
+              Sélectionnez parmi nos packs d'investissement adaptés à vos
+              besoins et à votre budget.
             </p>
           </div>
         </div>
@@ -62,8 +62,8 @@ export default function HeroBanner() {
               INVESTIR FACILEMENT
             </h2>
             <p className="text-xs">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt.
+              Procédez à votre investissement en quelques clics, de manière
+              sécurisée et rapide.
             </p>
           </div>
         </div>
@@ -74,8 +74,8 @@ export default function HeroBanner() {
               RECEVOIR LES RENDEMENTS
             </h2>
             <p className="text-xs">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt.
+              Bénéficiez de vos profits selon les termes de votre contrat
+              d'investissement.
             </p>
           </div>
         </div>

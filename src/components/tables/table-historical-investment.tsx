@@ -12,6 +12,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import { Inbox, Loader } from "lucide-react";
 import { PackData, Transaction } from "@/types";
 import {
   Table,
@@ -24,8 +25,7 @@ import {
 import { useEffect, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "../ui/button";
-import { Inbox } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
@@ -52,35 +52,42 @@ export const columns: ColumnDef<Transaction>[] = [
   {
     accessorKey: "status",
     header: "Status",
-    cell: ({ row }) => (
-      <Badge
-        variant="outline"
-        className={cn({
-          "border-green-400 text-green-400":
-            row.getValue("status") === "success",
-          "border-amber-400 text-amber-400":
-            row.getValue("status") === "pending",
-          "border-red-400 text-red-400": row.getValue("status") === "rejected",
-        })}
-      >
-        {(() => {
-          switch (row.getValue("status")) {
-            case "success":
-              return "Succès";
-            case "pending":
-              if ((row.getValue("pack") as PackData)?.id) {
-                return "En cours...";
-              } else {
+    cell: ({ row }) => {
+      const status = row.getValue("status");
+      const packId = (row.getValue("pack") as PackData)?.id;
+
+      return (
+        <Badge
+          variant="outline"
+          className={cn({
+            "border-green-400 text-green-400":
+              status === "success" || (status === "approved" && !packId),
+            "border-blue-400 text-blue-400": status === "approved" && packId,
+            "border-amber-400 text-amber-400": status === "pending",
+            "border-red-400 text-red-400": status === "rejected",
+          })}
+        >
+          {(() => {
+            switch (status) {
+              case "success":
+                return "Succès";
+              case "pending":
                 return "En attente...";
-              }
-            case "rejected":
-              return "Rejeté";
-            default:
-              return "Expiré";
-          }
-        })()}
-      </Badge>
-    ),
+              case "approved":
+                if (packId) {
+                  return "En cours...";
+                } else {
+                  return "Approuvé";
+                }
+              case "rejected":
+                return "Rejeté";
+              default:
+                return "N/A";
+            }
+          })()}
+        </Badge>
+      );
+    },
   },
   {
     accessorKey: "amount",
@@ -130,13 +137,14 @@ export const columns: ColumnDef<Transaction>[] = [
 ];
 
 type TableHistoricalInvestmentProps = {
+  loading?: boolean;
   transactions?: Transaction[];
 };
 
 export function TableHistoricalInvestment(
   props: TableHistoricalInvestmentProps
 ) {
-  const { transactions } = props;
+  const { loading, transactions } = props;
   const [data, setData] = useState<Transaction[]>([]);
   const [rowSelection, setRowSelection] = useState({});
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -228,8 +236,17 @@ export function TableHistoricalInvestment(
                   colSpan={columns.length}
                   className="text-center hover:bg-white"
                 >
-                  <Inbox className="mx-auto" />
-                  <p>Pas encore d&apos;historique</p>
+                  {loading ? (
+                    <div className="flex flex-col items-center gap-2">
+                      <Loader className="mx-auto animate-spin" />
+                      <p>Chargement de l&apos;historique...</p>
+                    </div>
+                  ) : data.length ? null : (
+                    <div className="flex flex-col items-center gap-2">
+                      <Inbox className="mx-auto" />
+                      <p>Pas encore d&apos;historique</p>
+                    </div>
+                  )}
                 </TableCell>
               </TableRow>
             )}

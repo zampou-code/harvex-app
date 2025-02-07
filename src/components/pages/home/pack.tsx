@@ -3,10 +3,11 @@
 import { Button } from "@/components/ui/button";
 import { CheckBroken } from "@/assets/svg";
 import { Element } from "react-scroll";
+import Link from "next/link";
 
 export default function Pack() {
   return (
-    <Element as="section" name="investment-plan">
+    <Element as="section" name="investment-plan" id="investment-plan">
       <div className="responvive-p-x py-16">
         <h2 className="font-bold text-xl md:text-3xl text-center mb-10">
           Plans d’investissement{" "}
@@ -19,8 +20,8 @@ export default function Pack() {
                 Pack Starter
               </h1>
               <p className="text-xs md:text-sm">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt.
+                Idéal pour débuter, ce pack offre une introduction simple et
+                accessible au monde des investissements.
               </p>
             </div>
             <div className="bg-primary flex justify-center items-center py-2 px-4">
@@ -48,23 +49,25 @@ export default function Pack() {
               </div>
             </div>
             <div className="px-4 pb-4 pt-2">
-              <Button className="w-full mb-1">Voir les details</Button>
+              <Button className="w-full mb-1" asChild>
+                <Link href="/register">Voir les details</Link>
+              </Button>
             </div>
           </div>
           <div className="w-full flex-1 shadow-custom rounded-lg">
-            <div className="bg-primary p-4 rounded-t-lg">
+            <div className="bg-black p-4 rounded-t-lg">
               <h1 className="text-2xl text-white font-bold">Recommander</h1>
             </div>
             <div className="p-4">
-              <h1 className="text-2xl text-primary font-bold mb-1">
+              <h1 className="text-2xl text-black font-bold mb-1">
                 Pack Premium
               </h1>
               <p className="text-sm">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt.
+                Pour les investisseurs intermédiaires cherchant à maximiser
+                leurs rendements avec un risque modéré.
               </p>
             </div>
-            <div className="bg-primary flex justify-center items-center py-2 px-4">
+            <div className="bg-black flex justify-center items-center py-2 px-4">
               <div className="text-right">
                 <h2 className="text-white text-xl lg:text-2xl xl:text-4xl font-bold">
                   250.000 FCFA
@@ -74,14 +77,24 @@ export default function Pack() {
             </div>
             <div className="p-4 space-y-3">
               <div className="flex justify-start items-center gap-3">
-                <CheckBroken width={14} height={14} className="inline" />
+                <CheckBroken
+                  width={14}
+                  height={14}
+                  color="black"
+                  className="inline text-black"
+                />
                 <p className="text-xs">
                   <span className="font-bold">Durées : </span>
                   10, 20 ou 30 jours
                 </p>
               </div>
               <div className="flex justify-start items-center gap-3">
-                <CheckBroken width={14} height={14} className="inline" />
+                <CheckBroken
+                  width={14}
+                  height={14}
+                  color="black"
+                  className="inline text-black"
+                />
                 <p className="text-xs flex-1">
                   <span className="font-bold">Rendements : </span>
                   exemple concret comme 1.000.000 → 1.750.000 F CFA en 30 jours.
@@ -89,7 +102,12 @@ export default function Pack() {
               </div>
             </div>
             <div className="px-4 pb-4 pt-2">
-              <Button className="w-full mb-1">Voir les details</Button>
+              <Button
+                asChild
+                className="w-full mb-1 bg-black hover:bg-black/90"
+              >
+                <Link href="/register">Voir les details</Link>
+              </Button>
             </div>
           </div>
           <div className="w-full flex-1 shadow-custom rounded-lg">
@@ -98,8 +116,8 @@ export default function Pack() {
                 Pack Business
               </h1>
               <p className="text-sm">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt.
+                Conçu pour les investisseurs expérimentés souhaitant des
+                rendements élevés sur des projets à long terme.
               </p>
             </div>
             <div className="bg-primary flex justify-center items-center py-2 px-4">
@@ -127,7 +145,9 @@ export default function Pack() {
               </div>
             </div>
             <div className="px-4 pb-4 pt-2">
-              <Button className="w-full mb-1">Voir les details</Button>
+              <Button className="w-full mb-1" asChild>
+                <Link href="/register">Voir les details</Link>
+              </Button>
             </div>
           </div>
         </div>

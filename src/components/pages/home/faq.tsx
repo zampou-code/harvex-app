@@ -11,7 +11,7 @@ import { Element } from "react-scroll";
 
 export default function Faq() {
   return (
-    <Element name="faq" as="section" className="bg-primary">
+    <Element name="faq" id="faq" as="section" className="bg-primary">
       <div className="py-16 responvive-p-x">
         <h2 className="font-bold text-white text-xl md:text-3xl text-center mb-2">
           Foire aux Questions (FAQ)

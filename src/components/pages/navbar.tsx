@@ -14,6 +14,7 @@ import { Link } from "react-scroll";
 import { Logo } from "@/assets/images";
 import { Menu } from "lucide-react";
 import NextLink from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function Navbar() {
   const menuItems = [
@@ -24,25 +25,33 @@ export default function Navbar() {
     { to: "contacts", label: "Contacts" },
   ];
 
+  const path = usePathname();
+
   function renderMenuItems() {
-    return (
-      <>
-        {menuItems.map((menuItem) => (
-          <Link
-            spy={true}
-            offset={-80}
-            smooth={true}
-            duration={500}
-            to={menuItem.to}
-            key={menuItem.to}
-            activeClass="text-primary underline"
-            className="text-base hover:underline underline-offset-4 hover:text-primary cursor-pointer"
-          >
-            {menuItem.label}
-          </Link>
-        ))}
-      </>
-    );
+    return menuItems.map((menuItem) => {
+      return path === "/" ? (
+        <Link
+          spy={true}
+          offset={-80}
+          smooth={true}
+          duration={500}
+          to={menuItem.to}
+          key={menuItem.to}
+          activeClass="text-primary underline"
+          className="text-base hover:underline underline-offset-4 hover:text-primary cursor-pointer"
+        >
+          {menuItem.label}
+        </Link>
+      ) : (
+        <NextLink
+          key={menuItem.to}
+          href={`/#${menuItem.to}`}
+          className="text-base hover:underline underline-offset-4 hover:text-primary cursor-pointer"
+        >
+          {menuItem.label}
+        </NextLink>
+      );
+    });
   }
 
   function renderAuthButton() {
@@ -60,18 +69,11 @@ export default function Navbar() {
 
   return (
     <nav className="sticky w-full top-0 left-0 z-20 flex items-center justify-between px-7 sm:px-10 lg:px-10 xl:px-36 py-6 bg-white dark:bg-gray-800">
-      <Link
-        to="/"
-        spy={true}
-        offset={-80}
-        smooth={true}
-        duration={500}
-        activeClass="text-primary"
-      >
+      <NextLink href="/#">
         <div className="w-auto h-9 cursor-pointer">
           <Logo alt="" className="w-full h-full object-contain" />
         </div>
-      </Link>
+      </NextLink>
 
       <div className="hidden lg:flex gap-5 lg:gap-10">{renderMenuItems()}</div>
       <div className="hidden lg:flex gap-2">{renderAuthButton()}</div>
@@ -84,7 +86,6 @@ export default function Navbar() {
             className="lg:hidden border-black text-black"
           >
             <Menu className="h-6 w-6" />
-            <span className="sr-only">Toggle navigation menu</span>
           </Button>
         </SheetTrigger>
         <SheetContent side="left">

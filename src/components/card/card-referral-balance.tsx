@@ -8,10 +8,11 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import NumberFlow from "@number-flow/react";
-import { DollarSign } from "lucide-react";
 import { Line, LineChart } from "recharts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AccountBalance } from "@/types";
+import { DialogReferralWithdraw } from "@/components/dialog/dialog-referral-withdraw";
+import { DialogReferralTransfert } from "@/components/dialog/dialog-referral-transfert";
 
 const data = [
   {
@@ -53,11 +54,15 @@ type CardReferralBalanceProps = {
 
 export function CardReferralBalance(props: CardReferralBalanceProps) {
   const { account } = props;
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-bold">Solde de parrainage</CardTitle>
-        <DollarSign className="h-4 w-4 text-muted-foreground" />
+        <div className="flex items-center gap-1">
+          <DialogReferralTransfert account={account} />
+          <DialogReferralWithdraw account={account} />
+        </div>
       </CardHeader>
       <CardContent className="pb-0">
         {account ? (

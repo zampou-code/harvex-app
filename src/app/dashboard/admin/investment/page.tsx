@@ -32,7 +32,13 @@ export default function Page() {
       const json = await response.json();
 
       if (json?.state) {
-        setTransactions(json.data);
+        const investmentTransactions = json.data.filter(
+          (transaction: Transaction) =>
+            transaction.type === "investment" &&
+            transaction.status === "pending"
+        );
+
+        setTransactions(investmentTransactions);
       }
     } finally {
       setLoading(false);
@@ -68,16 +74,14 @@ export default function Page() {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Historique des trans. admin</BreadcrumbPage>
+                  <BreadcrumbPage>Demande d'insvest. admin</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 lg:px-10 pt-0">
-          <h2 className="text-sm font-bold">
-            Historique des transactions admin
-          </h2>
+          <h2 className="text-sm font-bold">Demande d'insvestissemnt admin</h2>
           <TableAdminTransactions
             loading={loading}
             transactions={transactions}

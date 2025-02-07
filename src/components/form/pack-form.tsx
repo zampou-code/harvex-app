@@ -1,3 +1,4 @@
+import { HandCoins, Loader } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -6,17 +7,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Loader } from "lucide-react";
 import NumberFlow from "@number-flow/react";
 import { PackDetail } from "@/types";
 
 type PackFormProps = {
   data: PackDetail[];
-  onClick: (data: PackDetail) => Promise<void>;
+  onClick: (
+    data: PackDetail & { action: "demande" | "account" }
+  ) => Promise<void>;
 };
 
 export function PackForm(props: PackFormProps) {
@@ -37,12 +40,13 @@ export function PackForm(props: PackFormProps) {
   const availableAmounts = [...new Set(data.map((d) => d.amount))];
   const availableDurations = [...new Set(data.map((d) => d.number_of_day))];
 
-  const handleClick = async () => {
+  const handleClick = async (action: "demande" | "account") => {
     if (selectedAmount && selectedDuration && roi) {
       setLoading(true);
       try {
         await onClick({
           roi,
+          action,
           amount: +selectedAmount,
           number_of_day: +selectedDuration,
         });
@@ -114,6 +118,25 @@ export function PackForm(props: PackFormProps) {
           </SelectContent>
         </Select>
       </div>
+      {/* <div className="grid gap-2">
+        <Label>Montant</Label>
+        <Select
+          value={selectedAmount}
+          onValueChange={(value) => handleSelectionChange("amount", value)}
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Sélectionnez un montant" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectItem value="demande">
+                Faire une demande d'investissement
+              </SelectItem>
+              <SelectItem value="demande">Depi</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div> */}
       <div className="grid gap-2">
         <Label>RSI</Label>
         <div className="w-full p-1 flex justify-center items-center rounded-xl border-2 border-primary border-dashed">
@@ -128,9 +151,42 @@ export function PackForm(props: PackFormProps) {
           />
         </div>
       </div>
-      <Button className="w-full mt-2" onClick={handleClick} disabled={loading}>
-        Valider {loading && <Loader className="animate-spin" />}
-      </Button>
+      <Tabs defaultValue="demande" className="w-full mt-2">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger
+            value="demande"
+            className="text-[10px] lg:text-[8px] md:text-[8px] xl:text-[10px] 2xl:text-base px-2"
+          >
+            Demande d'Invest.
+          </TabsTrigger>
+          <TabsTrigger
+            value="account"
+            className="text-[10px] lg:text-[8px] md:text-[8px] xl:text-[10px] 2xl:text-base px-2"
+          >
+            Solde principale
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="demande">
+          <Button
+            className="w-full"
+            onClick={() => handleClick("demande")}
+            disabled={loading}
+          >
+            {loading ? <Loader className="animate-spin" /> : <HandCoins />}
+            Investire
+          </Button>
+        </TabsContent>
+        <TabsContent value="account">
+          <Button
+            className="w-full"
+            onClick={() => handleClick("account")}
+            disabled={loading}
+          >
+            {loading ? <Loader className="animate-spin" /> : <HandCoins />}
+            Investire
+          </Button>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

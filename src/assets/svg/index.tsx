@@ -161,7 +161,7 @@ export function CheckBroken(props: SvgProps) {
     >
       <path
         d="M12.25 7C12.25 9.89949 9.89949 12.25 7 12.25C4.10051 12.25 1.75 9.89949 1.75 7C1.75 4.10051 4.10051 1.75 7 1.75C7.8237 1.75 8.60309 1.93969 9.29688 2.27778M11.2656 3.71875L6.67188 8.3125L5.35938 7"
-        stroke="#E25E1F"
+        stroke={props.color ? props.color : "#E25E1F"}
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"

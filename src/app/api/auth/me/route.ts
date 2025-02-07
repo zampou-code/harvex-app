@@ -33,7 +33,6 @@ export const GET = auth(async function GET(request) {
       { status: 200 }
     );
   } catch (error) {
-    console.log(error);
     return NextResponse.json(
       {
         error,
@@ -59,26 +58,6 @@ export const POST = auth(async function POST(request) {
         { status: 401 }
       );
 
-    // console.log(data, fireAuth.currentUser);
-    // if (data?.password && request.auth.user?.email) {
-    //   // updatePassword(fireAuth?.currentUser as User, "12345679");
-    //   // confirmPasswordReset()
-    //   // sendPasswordResetEmail(fireAuth, request.auth.user?.email);
-    //   // const user = fireAuth.currentUser;
-    //   // await updatePassword(user, data.password);
-    //   console.log(data);
-
-    //   return NextResponse.json(
-    //     {
-    //       state: true,
-    //       data: {
-    //         message: "User information updated successfully",
-    //       },
-    //     },
-    //     { status: 201 }
-    //   );
-    // }
-
     await db
       .collection("users")
       .doc(user_id)
@@ -95,7 +74,6 @@ export const POST = auth(async function POST(request) {
       { status: 201 }
     );
   } catch (error) {
-    console.log(error);
     return NextResponse.json(
       {
         error,

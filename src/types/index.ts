@@ -14,11 +14,10 @@ export type Transaction = {
   id: string;
   amount: number;
   user_id: string;
-  fee_amount: number;
+  account: "main" | "affiliate";
+  type: "investment" | "withdraw";
   payment_mean?: "orange" | "wave" | "crypto";
-  account: "main" | "affilate";
-  type: "investment" | "deposit" | "withdraw";
-  status: "pending" | "success" | "rejected" | "expired";
+  status: "pending" | "success" | "approved" | "rejected";
   pack?: {
     id: string;
     roi: number;
@@ -39,18 +38,18 @@ export type UserKYC = {
 
 export type UserInfo = {
   id: string;
-  firstname: string;
-  lastname: string;
-  email: string;
-  phone: string;
-  country: string;
   city: string;
   kyc: UserKYC;
-  role: "user" | "admin";
+  email: string;
+  phone: string;
   sex: "M" | "F";
-  referral_code: string;
-  referral_id: string;
+  country: string;
+  lastname: string;
   created_at: Date;
+  firstname: string;
+  referral_id: string;
+  referral_code: string;
+  role: "user" | "admin";
 };
 
 export type Referrals = {
@@ -64,11 +63,11 @@ export type AccountBalance = {
 };
 
 export type TransactionSummary = {
-  totalInvestments: number;
+  count: number;
   totalDeposits: number;
+  totalInvestments: number;
   totalWithdrawals: number;
   transactions: Transaction[];
-  count: number;
 };
 
 export type DashboardData = {

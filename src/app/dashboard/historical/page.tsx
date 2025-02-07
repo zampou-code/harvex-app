@@ -21,11 +21,13 @@ import { TableHistoricalInvestment } from "@/components/tables/table-historical-
 import { Transaction } from "@/types";
 
 export default function Page() {
+  const [loading, setLoading] = useState<boolean>(true);
   const [investments, setInvestments] = useState<Transaction[]>([]);
 
   useEffect(() => {
     const fetchInvestments = async () => {
       try {
+        setLoading(true);
         const response = await fetch("/api/transactions");
 
         const json = await response.json();
@@ -34,6 +36,7 @@ export default function Page() {
           setInvestments(json.data);
         }
       } finally {
+        setLoading(false);
       }
     };
 
@@ -63,7 +66,10 @@ export default function Page() {
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 lg:px-10 pt-0">
           <h2 className="text-sm font-bold">Historiques</h2>
-          <TableHistoricalInvestment transactions={investments} />
+          <TableHistoricalInvestment
+            loading={loading}
+            transactions={investments}
+          />
         </div>
       </SidebarInset>
     </SidebarProvider>

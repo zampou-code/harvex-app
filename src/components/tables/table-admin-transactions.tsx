@@ -1,6 +1,17 @@
 "use client";
 
-import { CheckCheck, Inbox, MoreHorizontal, Trash, X } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowLeftToLine,
+  ArrowRight,
+  ArrowRightToLine,
+  CheckCheck,
+  Inbox,
+  Loader,
+  MoreHorizontal,
+  Trash,
+  X,
+} from "lucide-react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -32,63 +43,82 @@ import {
 import { useEffect, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { useSnackbar } from "notistack";
+import { enqueueSnackbar } from "notistack";
 
 export const columns: ColumnDef<Transaction>[] = [
   {
     accessorKey: "id",
     header: () => <div className="text-left">ID</div>,
-    cell: ({ row }) => <div className="capitalize">{row.getValue("id")}</div>,
+    cell: ({ row }) => (
+      <div className="capitalize">
+        {(row.getValue("id") as string).slice(0, 5)}
+      </div>
+    ),
   },
   {
     accessorKey: "type",
     header: () => <div className="text-left">Type</div>,
     cell: ({ row }) => {
       const type = row.getValue("type");
-      const frenchType =
-        type === "investment"
-          ? "Investissement"
-          : type === "deposit"
-          ? "Dépôt"
-          : "Retrait";
+      let frenchType = "";
+
+      switch (type) {
+        case "investment":
+          frenchType = "Investissement";
+          break;
+        case "withdraw":
+          frenchType = "Retrait";
+          break;
+
+        default:
+          frenchType = "N/A";
+      }
+
       return <div className="Capitalize">{frenchType}</div>;
     },
   },
   {
     accessorKey: "status",
     header: "Status",
-    cell: ({ row }) => (
-      <Badge
-        variant="outline"
-        className={cn({
-          "border-green-400 text-green-400":
-            row.getValue("status") === "success",
-          "border-amber-400 text-amber-400":
-            row.getValue("status") === "pending",
-          "border-red-400 text-red-400": row.getValue("status") === "rejected",
-        })}
-      >
-        {(() => {
-          switch (row.getValue("status")) {
-            case "success":
-              return "Succès";
-            case "pending":
-              if ((row.getValue("pack") as PackData)?.id) {
-                return "En cours...";
-              } else {
+    cell: ({ row }) => {
+      const status = row.getValue("status");
+      const packId = (row.getValue("pack") as PackData)?.id;
+
+      return (
+        <Badge
+          variant="outline"
+          className={cn({
+            "border-green-400 text-green-400":
+              status === "success" || (status === "approved" && !packId),
+            "border-blue-400 text-blue-400": status === "approved" && packId,
+            "border-amber-400 text-amber-400": status === "pending",
+            "border-red-400 text-red-400": status === "rejected",
+          })}
+        >
+          {(() => {
+            switch (status) {
+              case "success":
+                return "Succès";
+              case "pending":
                 return "En attente...";
-              }
-            case "rejected":
-              return "Rejeté";
-            default:
-              return "Expiré";
-          }
-        })()}
-      </Badge>
-    ),
+              case "approved":
+                if (packId) {
+                  return "En cours...";
+                } else {
+                  return "Approuvé";
+                }
+              case "rejected":
+                return "Rejeté";
+              default:
+                return "N/A";
+            }
+          })()}
+        </Badge>
+      );
+    },
   },
   {
     accessorKey: "amount",
@@ -121,12 +151,20 @@ export const columns: ColumnDef<Transaction>[] = [
     header: () => <div className="text-left">Compte</div>,
     cell: ({ row }) => {
       const type = row.getValue("account");
-      const frenchType =
-        type === "main"
-          ? "Principal"
-          : type === "affiliate"
-          ? "Parrainage"
-          : "N/A";
+      let frenchType = "";
+
+      switch (type) {
+        case "main":
+          frenchType = "Principal";
+          break;
+        case "affiliate":
+          frenchType = "Parrainage";
+          break;
+
+        default:
+          frenchType = "N/A";
+      }
+
       return <div>{frenchType}</div>;
     },
   },
@@ -144,9 +182,7 @@ export const columns: ColumnDef<Transaction>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       const transaction: Transaction = row.original;
-      return !transaction?.pack?.id ? (
-        <TableAction transaction={transaction} />
-      ) : null;
+      return <TableAction transaction={transaction} />;
     },
   },
 ];
@@ -157,16 +193,15 @@ type TableActionProps = {
 
 export function TableAction(props: TableActionProps) {
   const { transaction } = props;
-  const { enqueueSnackbar } = useSnackbar();
 
-  const handleApproveTransaction = async () => {
+  const handleTransactionStatus = async (status: "approved" | "rejected") => {
     try {
       const res = await fetch("/api/admin/transactions", {
         method: "POST",
         body: JSON.stringify({
+          status,
           transaction,
-          action: "update",
-          status: "success",
+          type: "update-transaction-satuts",
         }),
       });
 
@@ -174,53 +209,13 @@ export function TableAction(props: TableActionProps) {
 
       if (json?.state) {
         window.dispatchEvent(new CustomEvent("transaction-admin-updated"));
-        enqueueSnackbar("Transaction approuvée avec succès", {
-          variant: "success",
-          preventDuplicate: true,
-          autoHideDuration: 3000,
-          anchorOrigin: { vertical: "top", horizontal: "center" },
-        });
-      } else {
-        enqueueSnackbar("Échec de l'approbation de la transaction", {
-          variant: "error",
-          preventDuplicate: true,
-          autoHideDuration: 3000,
-          anchorOrigin: { vertical: "top", horizontal: "center" },
-        });
       }
-    } finally {
-    }
-  };
 
-  const handleRejectedTransaction = async () => {
-    try {
-      const res = await fetch("/api/admin/transactions", {
-        method: "POST",
-        body: JSON.stringify({
-          transaction,
-          action: "update",
-          status: "rejected",
-        }),
+      enqueueSnackbar(json?.message, {
+        autoHideDuration: 5000,
+        variant: json?.state ? "success" : "error",
+        anchorOrigin: { vertical: "top", horizontal: "center" },
       });
-
-      const json = await res.json();
-
-      if (json?.state) {
-        window.dispatchEvent(new CustomEvent("transaction-admin-updated"));
-        enqueueSnackbar("Transaction rejetée avec succès", {
-          variant: "success",
-          preventDuplicate: true,
-          autoHideDuration: 3000,
-          anchorOrigin: { vertical: "top", horizontal: "center" },
-        });
-      } else {
-        enqueueSnackbar("Échec du rejet de la transaction", {
-          variant: "error",
-          preventDuplicate: true,
-          autoHideDuration: 3000,
-          anchorOrigin: { vertical: "top", horizontal: "center" },
-        });
-      }
     } finally {
     }
   };
@@ -231,7 +226,7 @@ export function TableAction(props: TableActionProps) {
         method: "POST",
         body: JSON.stringify({
           transaction,
-          action: "transaction",
+          type: "delete-transaction",
         }),
       });
 
@@ -261,31 +256,35 @@ export function TableAction(props: TableActionProps) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="h-8 w-8 p-0">
-          <span className="sr-only">Open menu</span>
+          <span className="sr-only">Ouvrir le menu</span>
           <MoreHorizontal />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-        <DropdownMenuItem>
-          <Button
-            variant="default"
-            onClick={handleApproveTransaction}
-            className="bg-green-500 hover:bg-green-500/90"
-          >
-            <CheckCheck /> Approuver la transaction
-          </Button>
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          <Button onClick={handleRejectedTransaction} variant="destructive">
-            <X />
-            Refuser la transaction
-          </Button>
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          <Button onClick={handleDeleteTransaction} variant="destructive">
-            <Trash /> Annuler la transaction
-          </Button>
+        {transaction.status === "pending" && (
+          <>
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={() => handleTransactionStatus("approved")}
+            >
+              <CheckCheck /> Approuver la transaction
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              className="text-red-500 cursor-pointer"
+              onClick={() => handleTransactionStatus("rejected")}
+            >
+              <X /> Rejeter la transaction
+            </DropdownMenuItem>
+          </>
+        )}
+
+        <DropdownMenuItem
+          className="text-red-500 cursor-pointer"
+          onClick={handleDeleteTransaction}
+        >
+          <Trash /> Supprimer la transaction
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -293,11 +292,12 @@ export function TableAction(props: TableActionProps) {
 }
 
 type TableAdminTransactionsProps = {
+  loading?: boolean;
   transactions?: Transaction[];
 };
 
 export function TableAdminTransactions(props: TableAdminTransactionsProps) {
-  const { transactions } = props;
+  const { loading, transactions } = props;
   const [data, setData] = useState<Transaction[]>([]);
   const [rowSelection, setRowSelection] = useState({});
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -338,10 +338,10 @@ export function TableAdminTransactions(props: TableAdminTransactionsProps) {
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filtrer par montant..."
-          value={(table.getColumn("type")?.getFilterValue() as string) ?? ""}
+          placeholder="Filtrer par type..."
+          value={(table.getColumn("id")?.getFilterValue() as string) ?? ""}
           onChange={(event) => {
-            table.getColumn("type")?.setFilterValue(event.target.value);
+            table.getColumn("id")?.setFilterValue(event.target.value);
           }}
           className="max-w-sm"
         />
@@ -389,8 +389,17 @@ export function TableAdminTransactions(props: TableAdminTransactionsProps) {
                   colSpan={columns.length}
                   className="text-center hover:bg-white"
                 >
-                  <Inbox className="mx-auto" />
-                  <p>Pas encore d&apos;historique</p>
+                  {loading ? (
+                    <div className="flex flex-col items-center gap-2">
+                      <Loader className="mx-auto animate-spin" />
+                      <p>Chargement des transactions...</p>
+                    </div>
+                  ) : data.length ? null : (
+                    <div className="flex flex-col items-center gap-2">
+                      <Inbox className="mx-auto" />
+                      <p>Aucune transaction trouvé</p>
+                    </div>
+                  )}
                 </TableCell>
               </TableRow>
             )}
@@ -401,20 +410,20 @@ export function TableAdminTransactions(props: TableAdminTransactionsProps) {
         <div className="space-x-2">
           <div className="flex items-center gap-2">
             <Button
+              size="icon"
               variant="outline"
-              size="sm"
               onClick={() => table.setPageIndex(0)}
               disabled={!table.getCanPreviousPage()}
             >
-              Première
+              <ArrowLeftToLine />
             </Button>
             <Button
+              size="icon"
               variant="outline"
-              size="sm"
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
             >
-              Précédent
+              <ArrowLeft />
             </Button>
             <span className="flex items-center gap-1 text-sm">
               <div>Page</div>
@@ -424,20 +433,20 @@ export function TableAdminTransactions(props: TableAdminTransactionsProps) {
               </strong>
             </span>
             <Button
+              size="icon"
               variant="outline"
-              size="sm"
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
             >
-              Suivant
+              <ArrowRight />
             </Button>
             <Button
+              size="icon"
               variant="outline"
-              size="sm"
               onClick={() => table.setPageIndex(table.getPageCount() - 1)}
               disabled={!table.getCanNextPage()}
             >
-              Dernière
+              <ArrowRightToLine />
             </Button>
           </div>
         </div>

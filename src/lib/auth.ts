@@ -32,7 +32,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             return null;
           }
         } catch (error) {
-          console.log(error);
           return null;
         }
       },

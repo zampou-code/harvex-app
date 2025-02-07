@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChevronRight, Inbox } from "lucide-react";
+import { ChevronRight, Inbox, Loader } from "lucide-react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -53,28 +53,42 @@ export const columns: ColumnDef<Transaction>[] = [
   {
     accessorKey: "status",
     header: "Status",
-    cell: ({ row }) => (
-      <Badge
-        variant="outline"
-        className={cn({
-          "border-green-400 text-green-400":
-            row.getValue("status") === "success",
-          "border-amber-400 text-amber-400":
-            row.getValue("status") === "pending",
-          "border-red-400 text-red-400":
-            row.getValue("status") === "rejected" ||
-            row.getValue("status") === "expired",
-        })}
-      >
-        {row.getValue("status") === "success"
-          ? "Succès"
-          : row.getValue("status") === "pending"
-          ? "En cours..."
-          : row.getValue("status") === "rejected"
-          ? "Rejeté"
-          : "Expiré"}
-      </Badge>
-    ),
+    cell: ({ row }) => {
+      const status = row.getValue("status");
+      const packId = row.original?.pack?.id;
+
+      return (
+        <Badge
+          variant="outline"
+          className={cn({
+            "border-green-400 text-green-400":
+              status === "success" || (status === "approved" && !packId),
+            "border-blue-400 text-blue-400": status === "approved" && packId,
+            "border-amber-400 text-amber-400": status === "pending",
+            "border-red-400 text-red-400": status === "rejected",
+          })}
+        >
+          {(() => {
+            switch (status) {
+              case "success":
+                return "Succès";
+              case "pending":
+                return "En attente...";
+              case "approved":
+                if (packId) {
+                  return "En cours...";
+                } else {
+                  return "Approuvé";
+                }
+              case "rejected":
+                return "Rejeté";
+              default:
+                return "N/A";
+            }
+          })()}
+        </Badge>
+      );
+    },
   },
 
   {
@@ -94,11 +108,12 @@ export const columns: ColumnDef<Transaction>[] = [
 ];
 
 type TableInvestmentprops = {
+  loading?: boolean;
   transactions?: TransactionSummary;
 };
 
 export function TableInvestment(props: TableInvestmentprops) {
-  const { transactions } = props;
+  const { loading, transactions } = props;
   const [data, setData] = useState<Transaction[]>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -141,7 +156,7 @@ export function TableInvestment(props: TableInvestmentprops) {
         <CardTitle className="text-lg font-bold">
           Historique des transactions
         </CardTitle>
-        <Button variant="outline" size="sm" asChild>
+        <Button size="sm" asChild>
           <Link href="/dashboard/historical">
             Voir tout
             <ChevronRight className="-mr-1.5" />
@@ -191,8 +206,17 @@ export function TableInvestment(props: TableInvestmentprops) {
                   colSpan={columns.length}
                   className="text-center hover:bg-white"
                 >
-                  <Inbox className="mx-auto" />
-                  <p>Pas encore de transaction</p>
+                  {loading ? (
+                    <div className="flex flex-col items-center gap-2">
+                      <Loader className="mx-auto animate-spin" />
+                      <p>Chargement des transactions...</p>
+                    </div>
+                  ) : data.length ? null : (
+                    <div className="flex flex-col items-center gap-2">
+                      <Inbox className="mx-auto" />
+                      <p>Pas encore de transaction</p>
+                    </div>
+                  )}
                 </TableCell>
               </TableRow>
             )}

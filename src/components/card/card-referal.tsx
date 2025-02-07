@@ -56,8 +56,8 @@ export function CardReferal(props: CardReferalProps) {
         </p>
         <div className="h-[80px] w-full flex items-center gap-2">
           <Input
-            disabled
-            value={`https://harvexgroup.com/register/${
+            readOnly
+            value={`https://harvexgroup.com/register?referral_id=${
               user?.referral_code || ""
             }`}
           />

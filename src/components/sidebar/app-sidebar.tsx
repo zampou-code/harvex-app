@@ -4,7 +4,6 @@ import * as React from "react";
 
 import {
   BadgeDollarSign,
-  HandCoins,
   History,
   LayoutDashboard,
   LifeBuoy,
@@ -37,11 +36,6 @@ const data = {
       title: "Dashborad",
       url: "/dashboard",
       icon: LayoutDashboard,
-    },
-    {
-      title: "Finance",
-      url: "/dashboard/finance",
-      icon: HandCoins,
     },
     {
       title: "Pack d'investissements",
@@ -79,7 +73,17 @@ const data = {
       icon: Lock,
     },
     {
-      title: "Admin transactions",
+      title: "Demande d'invest. admin",
+      url: "/dashboard/admin/investment",
+      icon: Lock,
+    },
+    {
+      title: "Demande de retrait admin",
+      url: "/dashboard/admin/withdraw",
+      icon: Lock,
+    },
+    {
+      title: "Historique des trans. admin",
       url: "/dashboard/admin/transactions",
       icon: Lock,
     },

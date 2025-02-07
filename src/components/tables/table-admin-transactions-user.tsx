@@ -1,18 +1,16 @@
 "use client";
 
-import { AccountBalance, Transaction, UserInfo } from "@/types";
 import {
   ArrowLeft,
   ArrowLeftToLine,
   ArrowRight,
   ArrowRightToLine,
-  DollarSign,
-  Eye,
-  IdCard,
+  CheckCheck,
   Inbox,
   Loader,
   MoreHorizontal,
   Trash,
+  X,
 } from "lucide-react";
 import {
   ColumnDef,
@@ -33,6 +31,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { PackData, Transaction } from "@/types";
 import {
   Table,
   TableBody,
@@ -45,113 +44,135 @@ import { useEffect, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { DialogShowAccounts } from "@/components/dialog/dialog-show-accounts";
-import { DialogShowHistorical } from "@/components/dialog/dialog-show-historical";
-import { DialogShowKyc } from "@/components/dialog/dialog-show-kyc";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { enqueueSnackbar } from "notistack";
 
-export type DashbordAdminData = {
-  user: UserInfo;
-  account: AccountBalance;
-  transactions: Transaction[];
-};
-
-export const columns: ColumnDef<DashbordAdminData>[] = [
+export const columns: ColumnDef<Transaction>[] = [
   {
-    id: "id",
-    accessorFn: (row) => row.user.id,
+    accessorKey: "id",
     header: () => <div className="text-left">ID</div>,
     cell: ({ row }) => (
       <div className="capitalize">
-        {(row.getValue("id") as string)?.slice(0, 5)}
+        {(row.getValue("id") as string).slice(0, 5)}
       </div>
     ),
   },
   {
-    id: "firstname",
-    accessorFn: (row) => row.user.firstname,
-    header: () => <div className="text-left">Prénom</div>,
-    cell: ({ row }) => <div>{row.getValue("firstname")}</div>,
-  },
-  {
-    id: "lastname",
-    accessorFn: (row) => row.user.lastname,
-    header: () => <div className="text-left">Nom</div>,
-    cell: ({ row }) => <div>{row.getValue("lastname")}</div>,
-  },
-  {
-    id: "email",
-    accessorFn: (row) => row.user.email,
-    header: () => <div className="text-left">Email</div>,
-    cell: ({ row }) => <div>{row.getValue("email")}</div>,
-  },
-  {
-    id: "phone",
-    accessorFn: (row) => row.user.phone,
-    header: () => <div className="text-left">Telephone</div>,
-    cell: ({ row }) => <div>{row.getValue("phone")}</div>,
-  },
-  {
-    id: "country",
-    accessorFn: (row) => row.user.country,
-    header: () => <div className="text-left">Pays</div>,
-    cell: ({ row }) => <div>{row.getValue("country")}</div>,
-  },
-  {
-    id: "sex",
-    accessorFn: (row) => row.user.sex,
-    header: () => <div className="text-left">Sexe</div>,
+    accessorKey: "type",
+    header: () => <div className="text-left">Type</div>,
     cell: ({ row }) => {
-      const sex = row.getValue("sex");
-      const frenchRole = sex === "F" ? "Femme" : "Homme";
-      return <div>{frenchRole}</div>;
+      const type = row.getValue("type");
+      let frenchType = "";
+
+      switch (type) {
+        case "investment":
+          frenchType = "Investissement";
+          break;
+        case "withdraw":
+          frenchType = "Retrait";
+          break;
+
+        default:
+          frenchType = "N/A";
+      }
+
+      return <div className="Capitalize">{frenchType}</div>;
     },
   },
   {
-    id: "role",
-    accessorFn: (row) => row.user.role,
-    header: () => <div className="text-left">Rôle</div>,
+    accessorKey: "status",
+    header: "Status",
     cell: ({ row }) => {
-      const role = row.getValue("role");
-      const frenchRole = role === "user" ? "Client" : "Admin.";
-      return <div>{frenchRole}</div>;
-    },
-  },
-  {
-    id: "kycStatus",
-    accessorFn: (row) => row.user.kyc.status,
-    header: () => <div className="text-left">Statut KYC</div>,
-    cell: ({ row }) => {
-      const kycStatus = row.original.user.kyc.status;
-      const statusText =
-        {
-          pending: "En attente...",
-          approved: "Approuvé",
-          rejected: "Rejeté",
-        }[kycStatus] || "N/A";
+      const status = row.getValue("status");
+      const packId = (row.getValue("pack") as PackData)?.id;
 
       return (
         <Badge
           variant="outline"
           className={cn({
-            "border-green-400 text-green-400": kycStatus === "approved",
-            "border-amber-400 text-amber-400": kycStatus === "pending",
-            "border-red-400 text-red-400": kycStatus === "rejected",
+            "border-green-400 text-green-400":
+              status === "success" || (status === "approved" && !packId),
+            "border-blue-400 text-blue-400": status === "approved" && packId,
+            "border-amber-400 text-amber-400": status === "pending",
+            "border-red-400 text-red-400": status === "rejected",
           })}
         >
-          {statusText}
+          {(() => {
+            switch (status) {
+              case "success":
+                return "Succès";
+              case "pending":
+                return "En attente...";
+              case "approved":
+                if (packId) {
+                  return "En cours...";
+                } else {
+                  return "Approuvé";
+                }
+              case "rejected":
+                return "Rejeté";
+              default:
+                return "N/A";
+            }
+          })()}
         </Badge>
       );
     },
   },
   {
-    id: "createdAt",
-    accessorFn: (row) => row.user.created_at,
-    header: () => <div className="text-right">Date de création</div>,
+    accessorKey: "amount",
+    header: () => <div className="text-left">Montant</div>,
     cell: ({ row }) => {
-      const date = new Date(row.getValue("createdAt"));
+      const amount = parseFloat(row.getValue("amount"));
+
+      const formatted = new Intl.NumberFormat("fr-CF", {
+        style: "currency",
+        currency: "XOF",
+      }).format(amount);
+
+      return <div className="text-left font-medium">{formatted}</div>;
+    },
+  },
+  {
+    accessorKey: "pack",
+    header: () => <div className="text-left">Pack</div>,
+    cell: ({ row }) => {
+      const pack = row.getValue("pack") as PackData;
+      return (
+        <div className="text-left font-medium capitalize">
+          {pack?.name || "N/A"}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "account",
+    header: () => <div className="text-left">Compte</div>,
+    cell: ({ row }) => {
+      const type = row.getValue("account");
+      let frenchType = "";
+
+      switch (type) {
+        case "main":
+          frenchType = "Principal";
+          break;
+        case "affiliate":
+          frenchType = "Parrainage";
+          break;
+
+        default:
+          frenchType = "N/A";
+      }
+
+      return <div>{frenchType}</div>;
+    },
+  },
+  {
+    accessorKey: "created_at",
+    header: () => <div className="text-right">Date</div>,
+    cell: ({ row }) => {
+      const date = new Date(row.getValue("created_at"));
       const formattedDate = date.toLocaleDateString("fr-FR");
       return <div className="capitalize text-right">{formattedDate}</div>;
     },
@@ -160,30 +181,27 @@ export const columns: ColumnDef<DashbordAdminData>[] = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const data = row.original;
-      return <TableAction data={data} />;
+      const transaction: Transaction = row.original;
+      return <TableAction transaction={transaction} />;
     },
   },
 ];
 
 type TableActionProps = {
-  data: DashbordAdminData;
+  transaction: Transaction;
 };
 
 export function TableAction(props: TableActionProps) {
-  const { data } = props;
+  const { transaction } = props;
 
-  const [modal1, setModal1] = useState<boolean>(false);
-  const [modal2, setModal2] = useState<boolean>(false);
-  const [modal3, setModal3] = useState<boolean>(false);
-
-  const handleDeleteTransaction = async () => {
+  const handleTransactionStatus = async (status: "approved" | "rejected") => {
     try {
-      const res = await fetch("/api/admin/users", {
+      const res = await fetch("/api/admin/transactions", {
         method: "POST",
         body: JSON.stringify({
-          user: data.user,
-          type: "delete-user",
+          status,
+          transaction,
+          type: "update-transaction-satuts",
         }),
       });
 
@@ -194,7 +212,6 @@ export function TableAction(props: TableActionProps) {
       }
 
       enqueueSnackbar(json?.message, {
-        preventDuplicate: true,
         autoHideDuration: 5000,
         variant: json?.state ? "success" : "error",
         anchorOrigin: { vertical: "top", horizontal: "center" },
@@ -203,8 +220,40 @@ export function TableAction(props: TableActionProps) {
     }
   };
 
+  const handleDeleteTransaction = async () => {
+    try {
+      const res = await fetch("/api/admin/transactions", {
+        method: "POST",
+        body: JSON.stringify({
+          transaction,
+          type: "delete-transaction",
+        }),
+      });
+
+      const json = await res.json();
+
+      if (json?.state) {
+        window.dispatchEvent(new CustomEvent("user-admin-updated"));
+        enqueueSnackbar("Transaction annulée avec succès", {
+          variant: "success",
+          preventDuplicate: true,
+          autoHideDuration: 3000,
+          anchorOrigin: { vertical: "top", horizontal: "center" },
+        });
+      } else {
+        enqueueSnackbar("Échec de l'annulation de la transaction", {
+          variant: "error",
+          preventDuplicate: true,
+          autoHideDuration: 3000,
+          anchorOrigin: { vertical: "top", horizontal: "center" },
+        });
+      }
+    } finally {
+    }
+  };
+
   return (
-    <DropdownMenu open={modal1 || modal2 || modal3 ? true : undefined}>
+    <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="h-8 w-8 p-0">
           <span className="sr-only">Ouvrir le menu</span>
@@ -213,61 +262,55 @@ export function TableAction(props: TableActionProps) {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-        {data.user.kyc.file && (
-          <DialogShowKyc user={data.user} onOpenChange={setModal1}>
-            <DropdownMenuItem>
-              <IdCard /> Voir le KYC
+        {transaction.status === "pending" && (
+          <>
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={() => handleTransactionStatus("approved")}
+            >
+              <CheckCheck /> Approuver la transaction
             </DropdownMenuItem>
-          </DialogShowKyc>
+
+            <DropdownMenuItem
+              className="text-red-500 cursor-pointer"
+              onClick={() => handleTransactionStatus("rejected")}
+            >
+              <X /> Rejeter la transaction
+            </DropdownMenuItem>
+          </>
         )}
-        <DialogShowAccounts
-          user={data.user}
-          account={data.account}
-          onOpenChange={setModal2}
+
+        <DropdownMenuItem
+          className="text-red-500 cursor-pointer"
+          onClick={handleDeleteTransaction}
         >
-          <DropdownMenuItem>
-            <DollarSign /> Modifer le compte
-          </DropdownMenuItem>
-        </DialogShowAccounts>
-        <DialogShowHistorical
-          onOpenChange={setModal3}
-          transactions={data.transactions}
-        >
-          <DropdownMenuItem>
-            <Eye /> l'historique des tran.
-          </DropdownMenuItem>
-        </DialogShowHistorical>
-        {data.user.role !== "admin" && (
-          <DropdownMenuItem
-            className="text-red-500"
-            onClick={handleDeleteTransaction}
-          >
-            <Trash /> Supprimer le client
-          </DropdownMenuItem>
-        )}
+          <Trash /> Supprimer la transaction
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
 }
 
-type TableAdminUsersProps = {
+type TableAdminTransactionsUserProps = {
   loading?: boolean;
-  dashboardData?: DashbordAdminData[];
+  transactions?: Transaction[];
 };
 
-export function TableAdminUsers(props: TableAdminUsersProps) {
-  const { dashboardData, loading } = props;
-  const [data, setData] = useState<DashbordAdminData[]>([]);
+export function TableAdminTransactionsUser(
+  props: TableAdminTransactionsUserProps
+) {
+  const { loading, transactions } = props;
+  const [data, setData] = useState<Transaction[]>([]);
   const [rowSelection, setRowSelection] = useState({});
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 
   useEffect(() => {
-    if (dashboardData) {
-      setData(dashboardData);
+    if (transactions) {
+      setData(transactions);
     }
-  }, [dashboardData]);
+  }, [transactions]);
 
   const table = useReactTable({
     data: data,
@@ -297,10 +340,10 @@ export function TableAdminUsers(props: TableAdminUsersProps) {
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filtrer par email..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+          placeholder="Filtrer par type..."
+          value={(table.getColumn("id")?.getFilterValue() as string) ?? ""}
           onChange={(event) => {
-            table.getColumn("email")?.setFilterValue(event.target.value);
+            table.getColumn("id")?.setFilterValue(event.target.value);
           }}
           className="max-w-sm"
         />
@@ -351,12 +394,12 @@ export function TableAdminUsers(props: TableAdminUsersProps) {
                   {loading ? (
                     <div className="flex flex-col items-center gap-2">
                       <Loader className="mx-auto animate-spin" />
-                      <p>Chargement des utilisateurs...</p>
+                      <p>Chargement des transactions...</p>
                     </div>
                   ) : data.length ? null : (
                     <div className="flex flex-col items-center gap-2">
                       <Inbox className="mx-auto" />
-                      <p>Aucun utilisateur trouvé</p>
+                      <p>Aucune transaction trouvé</p>
                     </div>
                   )}
                 </TableCell>

@@ -36,7 +36,7 @@ export const GET = auth(async function GET(request) {
       user: userData,
       account: {
         main: accounts?.main?.amount || 0,
-        affiliate: accounts?.affilate?.amount || 0,
+        affiliate: accounts?.affiliate?.amount || 0,
       },
     };
 
@@ -51,7 +51,6 @@ export const GET = auth(async function GET(request) {
       { status: 201 }
     );
   } catch (error) {
-    console.log(error);
     return NextResponse.json(
       {
         error,

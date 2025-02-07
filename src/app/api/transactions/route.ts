@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { addDays } from "date-fns";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/firebase-admin";
+import { nanoid } from "nanoid";
 
 export const GET = auth(async function GET(request) {
   if (!request.auth)
@@ -15,12 +16,19 @@ export const GET = auth(async function GET(request) {
       .get();
 
     const transactions = transactionsSnapshot.docs.map((doc) => ({
-      id: doc.id,
+      doc_id: doc.id,
       ...doc.data(),
     }));
 
     return NextResponse.json(
-      { state: true, data: transactions },
+      {
+        state: true,
+        data: transactions.sort(
+          (a, b) =>
+            new Date((b as any).created_at).getTime() -
+            new Date((a as any).created_at).getTime()
+        ),
+      },
       { status: 200 }
     );
   } catch (error) {
@@ -28,7 +36,7 @@ export const GET = auth(async function GET(request) {
       {
         error,
         state: false,
-        data: { message: "Erreur lors de la récupération des transactions" },
+        message: "Erreur lors de la récupération des transactions",
       },
       { status: 500 }
     );
@@ -42,10 +50,10 @@ export const POST = auth(async function POST(request) {
   try {
     const user_id = request.auth.user?.id;
 
-    const { amount, fee_amount, type, account, pack, status, payment_mean } =
+    const { amount, type, account, pack, payment_mean, action } =
       await request.json();
 
-    if (type === "withdraw" && user_id) {
+    if (type === "transfert" && user_id && amount && account) {
       const accountSnapshot = await db
         .collection("accounts")
         .where("user_id", "==", user_id)
@@ -54,88 +62,235 @@ export const POST = auth(async function POST(request) {
       if (!accountSnapshot.empty && account) {
         const accountDoc = accountSnapshot.docs[0];
         const accountData = accountDoc.data();
-        console.log(`${account}: `, accountData[account].amount);
+
         if (accountData[account].amount < amount) {
           return NextResponse.json(
             {
               state: false,
-              message: `Solde est insuffisant pour effectuer ce retrait. Votre solde actuel est de ${accountData[account].amount} FCFA.`,
+              message: `Solde est insuffisant pour effectuer ce transfert. Votre solde actuel est de ${new Intl.NumberFormat(
+                "fr-FR",
+                { style: "currency", currency: "XOF" }
+              ).format(accountData[account].amount)}.`,
             },
             { status: 400 }
+          );
+        }
+
+        await db
+          .collection("accounts")
+          .doc(accountDoc.id)
+          .update({
+            affiliate: {
+              ...accountData.affiliate,
+              amount: accountData.affiliate.amount - Number(amount),
+            },
+            main: {
+              ...accountData.main,
+              amount: accountData.main.amount + Number(amount),
+            },
+          });
+
+        return NextResponse.json(
+          {
+            data: {},
+            state: true,
+            message: `Transfert effectué avec succès ! Le montant de ${new Intl.NumberFormat(
+              "fr-FR",
+              { style: "currency", currency: "XOF" }
+            ).format(
+              Number(amount)
+            )} a été transféré de votre compte de parrainage vers votre compte principal.`,
+          },
+          { status: 201 }
+        );
+      }
+    }
+
+    if (type === "withdraw" && user_id && amount && account && payment_mean) {
+      const accountSnapshot = await db
+        .collection("accounts")
+        .where("user_id", "==", user_id)
+        .get();
+
+      if (!accountSnapshot.empty && account) {
+        const accountDoc = accountSnapshot.docs[0];
+        const accountData = accountDoc.data();
+
+        if (accountData[account].amount < amount) {
+          return NextResponse.json(
+            {
+              state: false,
+              message: `Solde est insuffisant pour effectuer ce retrait. Votre solde actuel est de ${new Intl.NumberFormat(
+                "fr-FR",
+                { style: "currency", currency: "XOF" }
+              ).format(accountData[account].amount)}.`,
+            },
+            { status: 400 }
+          );
+        }
+
+        const transactionRef = await db.collection("transactions").add({
+          user_id,
+          id: nanoid(),
+          type: "withdraw",
+          status: "pending",
+          amount: Number(amount),
+          account: account || "",
+          payment_mean: payment_mean || "",
+          created_at: new Date().toISOString(),
+        });
+
+        return NextResponse.json(
+          {
+            state: true,
+            data: {
+              id: transactionRef.id,
+            },
+            message: `Votre demande de retrait a bien été enregistrée. Pour finaliser l'opération, veuillez contacter notre équipe de support par WhatsApp au plus vite.`,
+          },
+          { status: 201 }
+        );
+      }
+    }
+
+    if (
+      type === "investment" &&
+      user_id &&
+      amount &&
+      account &&
+      action &&
+      pack
+    ) {
+      const accountSnapshot = await db
+        .collection("accounts")
+        .where("user_id", "==", user_id)
+        .get();
+
+      if (!accountSnapshot.empty && account) {
+        const accountDoc = accountSnapshot.docs[0];
+        const accountData = accountDoc.data();
+
+        if (action === "demande") {
+          const transactionRef = await db.collection("transactions").add({
+            user_id,
+            id: nanoid(),
+            status: "pending",
+            type: "investment",
+            amount: Number(amount),
+            account: account || "",
+            payment_mean: payment_mean || "",
+            pack: {
+              ...pack,
+              start_date: new Date().toISOString(),
+              end_date: addDays(new Date(), pack?.number_of_day).toISOString(),
+            },
+            created_at: new Date().toISOString(),
+          });
+
+          return NextResponse.json(
+            {
+              state: true,
+              data: {
+                id: transactionRef.id,
+              },
+              message: `Votre demande de investissement a bien été enregistrée. Pour finaliser l'opération, veuillez contacter notre équipe de support par WhatsApp au plus vite.`,
+            },
+            { status: 201 }
+          );
+        }
+
+        if (action === "account") {
+          if (accountData[account].amount < amount) {
+            return NextResponse.json(
+              {
+                state: false,
+                message: `Solde est insuffisant pour effectuer cet investissement. Votre solde actuel est de ${accountData[account].amount} FCFA.`,
+              },
+              { status: 400 }
+            );
+          }
+
+          await db
+            .collection("accounts")
+            .doc(accountDoc.id)
+            .update({
+              [account]: {
+                ...accountData[account],
+                amount: accountData[account].amount - Number(amount),
+              },
+            });
+
+          const transactionRef = await db.collection("transactions").add({
+            user_id,
+            id: nanoid(),
+            status: "approved",
+            type: "investment",
+            amount: Number(amount),
+            account: account || "",
+            payment_mean: payment_mean || "",
+            pack: {
+              ...pack,
+              start_date: new Date().toISOString(),
+              end_date: addDays(new Date(), pack?.number_of_day).toISOString(),
+            },
+            created_at: new Date().toISOString(),
+          });
+
+          const userSnapshot = await db.collection("users").doc(user_id).get();
+
+          if (userSnapshot.exists) {
+            const userData = userSnapshot.data();
+            const parrainId = userData?.parrain_id;
+
+            if (parrainId) {
+              const parrainAccountSnapshot = await db
+                .collection("accounts")
+                .where("referral_code", "==", parrainId)
+                .get();
+
+              if (!parrainAccountSnapshot.empty) {
+                const parrainAccountDoc = parrainAccountSnapshot.docs[0];
+                const parrainAccountData = parrainAccountDoc.data();
+                const bonusAmount = Number(amount) * 0.03;
+
+                await db
+                  .collection("accounts")
+                  .doc(parrainAccountDoc.id)
+                  .update({
+                    affiliate: {
+                      ...parrainAccountData.main,
+                      amount: parrainAccountData.main.amount + bonusAmount,
+                    },
+                  });
+              }
+            }
+          }
+
+          return NextResponse.json(
+            {
+              state: true,
+              data: {
+                id: transactionRef.id,
+              },
+              message: `Félicitations ! Votre investissement a été effectué avec succès. Vous recevrez bientôt les détails de votre placement.`,
+            },
+            { status: 201 }
           );
         }
       }
     }
 
-    switch (type) {
-      case "investment":
-        if (!user_id || !amount || !pack) {
-          return NextResponse.json(
-            { error: "Missing parameters", state: false },
-            { status: 400 }
-          );
-        }
-        break;
-      case "deposit":
-      case "withdraw":
-        if (!user_id || !amount || !account || !status || !payment_mean) {
-          return NextResponse.json(
-            { error: "Missing parameters", state: false },
-            { status: 400 }
-          );
-        }
-        break;
-
-      default:
-        return NextResponse.json(
-          { error: "Missing parameters", state: false },
-          { status: 400 }
-        );
-    }
-
-    const transactionRef = await db.collection("transactions").add({
-      user_id,
-      id: `${Math.random().toString(36).charAt(0)}${Math.random()
-        .toString(36)
-        .substring(2, 9)}`,
-      amount: Number(amount),
-      fee_amount: Number(fee_amount) || 0,
-      status: status || "",
-      payment_mean: payment_mean || "",
-      account: account || "",
-      type,
-      pack: pack
-        ? {
-            ...pack,
-            start_date: new Date().toISOString(),
-            end_date: addDays(new Date(), pack?.number_of_day).toISOString(),
-          }
-        : {},
-      created_at: new Date().toISOString(),
-    });
-
     return NextResponse.json(
-      {
-        state: true,
-        data: {
-          id: transactionRef.id,
-        },
-        message: `Votre demande de ${
-          type === "deposit" ? "dépôt" : "retrait"
-        } a bien été enregistrée. Pour finaliser l'opération, veuillez contacter notre équipe de support par WhatsApp au plus vite.`,
-      },
-      { status: 201 }
+      { error: "Missing parameters", state: false },
+      { status: 400 }
     );
   } catch (error) {
-    console.log(error);
     return NextResponse.json(
       {
         error,
         state: false,
-        data: {
-          message:
-            "Une erreur s'est produite lors de votre opération financière. Veuillez vérifier vos informations et réessayer. Si le problème persiste, contactez notre support.",
-        },
+        message:
+          "Une erreur s'est produite lors de votre opération financière. Veuillez vérifier vos informations et réessayer. Si le problème persiste, contactez notre support.",
       },
       { status: 500 }
     );
