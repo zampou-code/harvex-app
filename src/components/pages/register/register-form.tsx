@@ -351,8 +351,8 @@ export function RegisterForm({
       </Card>
       <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-primary">
         En cliquant sur inscription, vous acceptez nos{" "}
-        <a href="#">conditions de service</a> et notre{" "}
-        <a href="#">politique de confidentialité</a>.
+        <Link href="/legal">conditions de service</Link> et notre{" "}
+        <Link href="/legal">politique de confidentialité</Link>.
       </div>
     </div>
   );

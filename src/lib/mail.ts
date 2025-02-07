@@ -28,8 +28,8 @@ export async function sendMail({ to, name, subject, body }: sendMailType) {
       to,
       name,
       subject,
-      from: "contact@harvexgroupe.com",
       html: emailHtml,
+      from: "no-reply@harvexgroupe.com",
     };
 
     await transporter.sendMail(options);

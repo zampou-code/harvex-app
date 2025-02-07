@@ -48,9 +48,6 @@ const formSchema = z.object({
     .nonempty({
       message: "Le nom ne peut pas être vide.",
     }),
-  email: z.string().email({
-    message: "Veuillez entrer une adresse email valide.",
-  }),
   country: z
     .string({ required_error: "" })
     .nonempty({ message: "Le pays ne peut pas être vide." }),
@@ -82,7 +79,6 @@ export function CardInfo(props: CardInfoProps) {
     defaultValues: {
       firstname: "",
       lastname: "",
-      email: "",
       phone: "",
       country: "",
       city: "",
@@ -94,7 +90,6 @@ export function CardInfo(props: CardInfoProps) {
     if (user) {
       form.setValue("firstname", user.firstname);
       form.setValue("lastname", user.lastname);
-      form.setValue("email", user.email);
       form.setValue("phone", user.phone);
       form.setValue("country", user.country);
       form.setValue("city", user.city);
@@ -178,23 +173,23 @@ export function CardInfo(props: CardInfoProps) {
                 />
               </div>
               <div className="flex gap-2 w-full">
-                <FormField
-                  name="email"
-                  control={form.control}
-                  render={({ field }) => (
-                    <FormItem className="space-y-0 flex-1">
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        {user ? (
-                          <Input placeholder="m@mail.com" {...field} />
-                        ) : (
-                          <Skeleton className="w-full h-9" />
-                        )}
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <FormItem className="space-y-0 flex-1">
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    {user ? (
+                      <Input
+                        placeholder="m@mail.com"
+                        defaultValue={user.email}
+                        readOnly
+                        disabled
+                      />
+                    ) : (
+                      <Skeleton className="w-full h-9" />
+                    )}
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+
                 <FormField
                   name="phone"
                   control={form.control}

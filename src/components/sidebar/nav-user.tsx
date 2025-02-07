@@ -28,7 +28,7 @@ import { man, woman } from "@/assets/images/pp";
 import { KYCBadge } from "@/assets/images";
 import Link from "next/link";
 import React from "react";
-import { Skeleton } from "../ui/skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 import { UserInfo } from "@/types";
 import { useRouter } from "next/navigation";
 

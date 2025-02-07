@@ -13,7 +13,7 @@ import { Loader, Save } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Skeleton } from "../ui/skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 import { UserInfo } from "@/types";
 import { useForm } from "react-hook-form";
 import { useSnackbar } from "notistack";
@@ -21,35 +21,10 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 const formSchema = z.object({
-  oldPassword: z
-    .string()
-    .min(8, {
-      message: "Le mot de passe doit comporter au moins 8 caractères.",
-    })
-    .nonempty({
-      message: "Le mot de passe ne peut pas être vide.",
-    }),
-  password: z
-    .string()
-    .min(8, {
-      message: "Le mot de passe doit comporter au moins 8 caractères.",
-    })
-    .nonempty({
-      message: "Le mot de passe ne peut pas être vide.",
-    }),
-  confirmPassword: z
-    .string()
-    .min(8, {
-      message: "Le mot de passe doit comporter au moins 8 caractères.",
-    })
-    .nonempty({
-      message: "Le mot de passe ne peut pas être vide.",
-    }),
+  email: z.string().email({
+    message: "Veuillez entrer une adresse email valide.",
+  }),
 });
-// .refine((data) => data.password === data.confirmPassword, {
-//   message: "Les mots de passe ne correspondent pas",
-//   path: ["confirmPassword"],
-// });
 
 type CardPasswordProps = {
   user?: UserInfo;
@@ -61,42 +36,33 @@ export function CardPassword(props: CardPasswordProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      password: "",
-      oldPassword: "",
-      confirmPassword: "",
+      email: "",
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      const res = await fetch("/api/auth/me", {
+      const response = await fetch("/api/auth/reset-password", {
         method: "POST",
         headers: {
-          Accept: "application/json",
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(values),
+        body: JSON.stringify({
+          ...values,
+        }),
       });
 
-      const json = await res.json();
+      const json = await response.json();
 
       if (json?.state) {
-        enqueueSnackbar("Mot de passe mises à jour avec succès", {
-          variant: "success",
-          preventDuplicate: true,
-          autoHideDuration: 3000,
-          anchorOrigin: { vertical: "top", horizontal: "center" },
-        });
-      } else {
-        enqueueSnackbar(
-          "Une erreur s'est produite lors de la mise à jour de votre mot de passe. Veuillez réessayer.",
-          {
-            variant: "error",
-            preventDuplicate: true,
-            autoHideDuration: 3000,
-            anchorOrigin: { vertical: "top", horizontal: "center" },
-          }
-        );
+        form.reset();
       }
+
+      enqueueSnackbar(json?.message, {
+        autoHideDuration: 5000,
+        variant: json?.state ? "success" : "error",
+        anchorOrigin: { vertical: "top", horizontal: "center" },
+      });
     } finally {
     }
   }
@@ -108,48 +74,14 @@ export function CardPassword(props: CardPasswordProps) {
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <div className="flex flex-col gap-4">
               <FormField
-                name="oldPassword"
+                name="email"
                 control={form.control}
                 render={({ field }) => (
                   <FormItem className="space-y-0">
-                    <FormLabel>Ancien mot de passe</FormLabel>
+                    <FormLabel>Email</FormLabel>
                     <FormControl>
                       {user ? (
-                        <Input type="password" {...field} />
-                      ) : (
-                        <Skeleton className="w-full h-9" />
-                      )}
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                name="password"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem className="space-y-0">
-                    <FormLabel>Mot de passe</FormLabel>
-                    <FormControl>
-                      {user ? (
-                        <Input type="password" {...field} />
-                      ) : (
-                        <Skeleton className="w-full h-9" />
-                      )}
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                name="confirmPassword"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem className="space-y-0">
-                    <FormLabel>Confirmez le mot de passe</FormLabel>
-                    <FormControl>
-                      {user ? (
-                        <Input type="password" {...field} />
+                        <Input type="email" {...field} />
                       ) : (
                         <Skeleton className="w-full h-9" />
                       )}

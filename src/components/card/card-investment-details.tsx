@@ -101,7 +101,7 @@ export function CardInvestmentDetails(props: CardInvestmentDetailsProps) {
             <Countdown
               date={investment?.pack?.end_date}
               onComplete={() => setIsForward(true)}
-              renderer={({ days, hours, minutes, seconds }) => (
+              renderer={() => (
                 <NumberFlow
                   className="text-xs font-bold"
                   value={Number(profit.toFixed(2)) || 0}
@@ -113,26 +113,6 @@ export function CardInvestmentDetails(props: CardInvestmentDetailsProps) {
                     trailingZeroDisplay: "stripIfInteger",
                   }}
                 />
-                // <>
-                // <div className="flex justify-between items-center gap-1">
-                //   <div className="text-center">
-                //     <NumberFlow className="font-bold" value={days} />
-                //     <div className="text-[8px] -mt-2">jours</div>
-                //   </div>
-                //   <div className="text-center">
-                //     <NumberFlow className="font-bold" value={hours} />
-                //     <div className="text-[8px] -mt-2">heurs</div>
-                //   </div>
-                //   <div className="text-center">
-                //     <NumberFlow className="font-bold" value={minutes} />
-                //     <div className="text-[8px] -mt-2">minutes</div>
-                //   </div>
-                //   <div className="text-center">
-                //     <NumberFlow className="font-bold" value={seconds} />
-                //     <div className="text-[8px] -mt-2">seconds</div>
-                //   </div>
-                // </div>
-                // </>
               )}
             />
           </div>

@@ -23,7 +23,7 @@ import { deleteObject, ref, uploadBytes } from "firebase/storage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { KYCBadge } from "@/assets/images";
-import { Skeleton } from "../ui/skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 import { UserInfo } from "@/types";
 import { storage } from "@/lib/firebase";
 import { useForm } from "react-hook-form";
