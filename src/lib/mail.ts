@@ -28,6 +28,7 @@ export async function sendMail({ to, name, subject, body }: sendMailType) {
       to,
       name,
       subject,
+      from: "contact@harvexgroupe.com",
       html: emailHtml,
     };
 
