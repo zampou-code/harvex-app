@@ -32,26 +32,13 @@ export default function Pack(props: PackProps) {
     name: string,
     id: string
   ) {
-    if (account?.user?.kyc?.status !== "approved") {
-      enqueueSnackbar(
-        "Pour effectuer un retrait, vous devez d'abord valider votre identité (KYC). Veuillez compléter la vérification KYC dans votre profil avant de poursuivre cette opération.",
-        {
-          variant: "error",
-          autoHideDuration: 5000,
-          anchorOrigin: { vertical: "top", horizontal: "center" },
-        }
-      );
-
-      return;
-    }
-
     if (
       account?.account?.main &&
       pack.action === "account" &&
       account.account.main < pack.amount
     ) {
       enqueueSnackbar(
-        `Solde est insuffisant pour effectuer ce retrait. Votre solde actuel est de ${new Intl.NumberFormat(
+        `Solde est insuffisant pour effectuer cet investissement. Votre solde actuel est de ${new Intl.NumberFormat(
           "fr-FR",
           { style: "currency", currency: "XOF" }
         ).format(account.account.main)}.`,
