@@ -26,36 +26,43 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Transaction } from "@/types";
 
 export default function Page() {
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [investments, setInvestments] = useState<Transaction[]>([]);
 
-  useEffect(() => {
-    const fetchInvestments = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch("/api/transactions");
+  const fetchInvestments = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch("/api/transactions");
 
-        if (!response.ok) {
-          throw new Error("Erreur lors de la récupération des investissements");
-        }
-
-        const json = await response.json();
-
-        if (json?.state) {
-          const investmentTransactions = json.data.filter(
-            (transaction: Transaction) =>
-              transaction.type === "investment" &&
-              transaction.status === "approved"
-          );
-
-          setInvestments(investmentTransactions);
-        }
-      } finally {
-        setLoading(false);
+      if (!response.ok) {
+        throw new Error("Erreur lors de la récupération des investissements");
       }
-    };
 
+      const json = await response.json();
+
+      if (json?.state) {
+        const investmentTransactions = json.data.filter(
+          (transaction: Transaction) =>
+            transaction.type === "investment" &&
+            transaction.status === "approved"
+        );
+
+        setInvestments(investmentTransactions);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchInvestments();
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("user-investment-updated", fetchInvestments);
+    return () => {
+      window.removeEventListener("user-investment-updated", fetchInvestments);
+    };
   }, []);
 
   return (

@@ -50,7 +50,7 @@ export const POST = auth(async function POST(request) {
   try {
     const user_id = request.auth.user?.id;
 
-    const { amount, type, account, pack, payment_mean, action } =
+    const { amount, type, account, pack, payment_mean, action, investment } =
       await request.json();
 
     if (type === "transfert" && user_id && amount && account) {
@@ -280,8 +280,63 @@ export const POST = auth(async function POST(request) {
       }
     }
 
+    if (type === "update-investment" && user_id && investment) {
+      const accountSnapshot = await db
+        .collection("accounts")
+        .where("user_id", "==", user_id)
+        .get();
+
+      if (!accountSnapshot.empty) {
+        const accountDoc = accountSnapshot.docs[0];
+        const accountData = accountDoc.data();
+
+        const currentDate = new Date();
+        const endDate = new Date(investment.pack.end_date);
+
+        if (currentDate < endDate) {
+          return NextResponse.json(
+            {
+              state: false,
+              message: `Votre investissement n'est pas encore arrivé à terme. La date de fin prévue est le ${endDate.toLocaleDateString(
+                "fr-FR"
+              )}. Veuillez patienter jusqu'à cette date pour récupérer vos gains.`,
+            },
+            { status: 400 }
+          );
+        }
+
+        await db
+          .collection("accounts")
+          .doc(accountDoc.id)
+          .update({
+            main: {
+              ...accountData[account],
+              amount: accountData.main.amount + Number(investment.pack.roi),
+            },
+          });
+
+        await db.collection("transactions").doc(investment.doc_id).update({
+          status: "success",
+          updated_at: new Date().toISOString(),
+        });
+
+        return NextResponse.json(
+          {
+            state: true,
+            message: `Félicitations ! Votre investissement de ${new Intl.NumberFormat(
+              "fr-FR",
+              { style: "currency", currency: "XOF" }
+            ).format(
+              investment.pack.roi
+            )} a été crédité avec succès sur votre compte principal. Nous vous souhaitons une excellente expérience d'investissement avec nous.`,
+          },
+          { status: 201 }
+        );
+      }
+    }
+
     return NextResponse.json(
-      { error: "Missing parameters", state: false },
+      { message: "Missing parameters", state: false },
       { status: 400 }
     );
   } catch (error) {

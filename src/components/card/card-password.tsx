@@ -9,12 +9,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Loader, Save } from "lucide-react";
+import { Loader, RotateCcw } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UserInfo } from "@/types";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useSnackbar } from "notistack";
 import { z } from "zod";
@@ -39,6 +40,12 @@ export function CardPassword(props: CardPasswordProps) {
       email: "",
     },
   });
+
+  useEffect(() => {
+    if (user) {
+      form.setValue("email", user.email);
+    }
+  }, [user, form]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
@@ -70,6 +77,13 @@ export function CardPassword(props: CardPasswordProps) {
   return (
     <Card>
       <CardContent className="pt-6">
+        <div className="mb-4">
+          <p className="text-sm text-muted-foreground">
+            Pour réinitialiser votre mot de passe, veuillez saisir votre adresse
+            email ci-dessous. Un email contenant les instructions de
+            réinitialisation vous sera envoyé.
+          </p>
+        </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <div className="flex flex-col gap-4">
@@ -81,7 +95,7 @@ export function CardPassword(props: CardPasswordProps) {
                     <FormLabel>Email</FormLabel>
                     <FormControl>
                       {user ? (
-                        <Input type="email" {...field} />
+                        <Input type="email" {...field} readOnly disabled />
                       ) : (
                         <Skeleton className="w-full h-9" />
                       )}
@@ -96,9 +110,9 @@ export function CardPassword(props: CardPasswordProps) {
                     {form.formState.isSubmitting ? (
                       <Loader className="animate-spin" />
                     ) : (
-                      <Save />
+                      <RotateCcw />
                     )}
-                    Sauvegarder
+                    Réinitialiser
                   </Button>
                 ) : (
                   <Skeleton className="w-40 h-9" />

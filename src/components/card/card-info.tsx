@@ -111,21 +111,14 @@ export function CardInfo(props: CardInfoProps) {
 
       if (json?.state) {
         window.dispatchEvent(new CustomEvent("user-info-updated"));
-
-        enqueueSnackbar(json?.message, {
-          variant: "success",
-          preventDuplicate: true,
-          autoHideDuration: 3000,
-          anchorOrigin: { vertical: "top", horizontal: "center" },
-        });
-      } else {
-        enqueueSnackbar(json?.message, {
-          variant: "error",
-          preventDuplicate: true,
-          autoHideDuration: 3000,
-          anchorOrigin: { vertical: "top", horizontal: "center" },
-        });
       }
+
+      enqueueSnackbar(json?.message, {
+        variant: json?.state ? "success" : "error",
+        preventDuplicate: true,
+        autoHideDuration: 5000,
+        anchorOrigin: { vertical: "top", horizontal: "center" },
+      });
     } finally {
     }
   }

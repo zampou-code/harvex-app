@@ -12,6 +12,7 @@ export type PackData = {
 
 export type Transaction = {
   id: string;
+  doc_id: string;
   amount: number;
   user_id: string;
   account: "main" | "affiliate";

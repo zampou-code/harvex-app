@@ -1,11 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CirclePlus, DollarSign, Loader } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import Countdown from "react-countdown";
-import { DollarSign } from "lucide-react";
 import NumberFlow from "@number-flow/react";
 import { Transaction } from "@/types";
+import { enqueueSnackbar } from "notistack";
 import useProfit from "@/hooks/use-profit";
 
 type CardInvestmentDetailsProps = {
@@ -15,6 +16,7 @@ type CardInvestmentDetailsProps = {
 export function CardInvestmentDetails(props: CardInvestmentDetailsProps) {
   const { investment } = props;
   const profit = useProfit(investment?.pack);
+  const [loading, setLoading] = useState<boolean>(false);
   const [isForward, setIsForward] = useState<boolean>(false);
   const [remainingDays, setRemainingDays] = useState<number>(0);
 
@@ -44,6 +46,37 @@ export function CardInvestmentDetails(props: CardInvestmentDetailsProps) {
 
     getRemainingDays();
   }, [investment]);
+
+  const handleCreditClient = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch("/api/transactions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          type: "update-investment",
+          investment: investment,
+        }),
+      });
+
+      const json = await response.json();
+
+      if (json?.state) {
+        window.dispatchEvent(new CustomEvent("user-investment-updated"));
+      }
+
+      enqueueSnackbar(json?.message, {
+        preventDuplicate: true,
+        autoHideDuration: 5000,
+        variant: json?.state ? "success" : "error",
+        anchorOrigin: { vertical: "top", horizontal: "center" },
+      });
+    } finally {
+      setLoading(true);
+    }
+  };
 
   return (
     <Card>
@@ -117,7 +150,14 @@ export function CardInvestmentDetails(props: CardInvestmentDetailsProps) {
             />
           </div>
           {isForward ? (
-            <Button className="flex-1">Ajouter a mon compte</Button>
+            <Button
+              className="flex-1"
+              onClick={handleCreditClient}
+              disabled={loading}
+            >
+              {loading ? <Loader className="animate-spin" /> : <CirclePlus />}
+              Ajouter a mon compte
+            </Button>
           ) : (
             <Button
               disabled
