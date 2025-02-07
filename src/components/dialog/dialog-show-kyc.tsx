@@ -10,7 +10,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { ReactElement, useCallback, useEffect, useState } from "react";
-import { getDownloadURL, ref } from "firebase/storage";
+import { deleteObject, getDownloadURL, ref } from "firebase/storage";
 
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
@@ -50,6 +50,16 @@ export function DialogShowKyc(props: DialogShowKycProps) {
   const handleKYCStatus = async (status: "approved" | "rejected") => {
     try {
       setLoading(true);
+
+      if (user?.kyc?.file && status == "rejected") {
+        const oldFileRef = ref(storage, user.kyc.file);
+
+        try {
+          await deleteObject(oldFileRef);
+        } finally {
+        }
+      }
+
       const response = await fetch("/api/admin/users", {
         method: "POST",
         headers: {
