@@ -1,4 +1,4 @@
-import { ArrowLeftRight, ArrowUpRight, LifeBuoy, Loader } from "lucide-react";
+import { ArrowLeftRight, Loader } from "lucide-react";
 import {
   Dialog,
   DialogClose,
@@ -17,12 +17,11 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { closeSnackbar, enqueueSnackbar } from "notistack";
 
 import { AccountBalance } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import Link from "next/link";
+import { enqueueSnackbar } from "notistack";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { z } from "zod";

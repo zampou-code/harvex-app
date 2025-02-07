@@ -104,11 +104,11 @@ export default function Page() {
             ) : (
               <div className="col-span-3 flex flex-col items-center justify-center gap-4 p-8 text-center">
                 <div className="text-xl font-semibold">
-                  Vous n'avez pas encore d'investissement actif
+                  Vous n&apos;avez pas encore d&apos;investissement actif
                 </div>
                 <div className="text-muted-foreground mb-4">
                   Commencez dès maintenant à faire fructifier votre argent en
-                  choisissant un de nos packs d'investissement sécurisés et
+                  choisissant un de nos packs d&apos;investissement sécurisés et
                   rentables.
                 </div>
                 <Link href="/dashboard/pack">

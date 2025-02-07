@@ -157,7 +157,7 @@ export function PackForm(props: PackFormProps) {
             value="demande"
             className="text-[10px] lg:text-[8px] md:text-[8px] xl:text-[10px] 2xl:text-base px-2"
           >
-            Demande d'Invest.
+            Demande d&apos;invest.
           </TabsTrigger>
           <TabsTrigger
             value="account"

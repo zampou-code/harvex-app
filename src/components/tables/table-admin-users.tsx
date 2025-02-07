@@ -234,7 +234,7 @@ export function TableAction(props: TableActionProps) {
           transactions={data.transactions}
         >
           <DropdownMenuItem>
-            <Eye /> l'historique des tran.
+            <Eye /> l&apos;historique des tran.
           </DropdownMenuItem>
         </DialogShowHistorical>
         {data.user.role !== "admin" && (

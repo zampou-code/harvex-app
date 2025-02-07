@@ -74,14 +74,16 @@ export default function Page() {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Demande d'insvest. admin</BreadcrumbPage>
+                  <BreadcrumbPage>Demande d&apos;insvest. admin</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 lg:px-10 pt-0">
-          <h2 className="text-sm font-bold">Demande d'insvestissemnt admin</h2>
+          <h2 className="text-sm font-bold">
+            Demande d&apos;insvestissement admin
+          </h2>
           <TableAdminTransactions
             loading={loading}
             transactions={transactions}

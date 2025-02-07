@@ -35,6 +35,7 @@ export function CardInvestmentDetails(props: CardInvestmentDetailsProps) {
           setRemainingDays(json?.data?.remaining_days || 0);
         }
       } catch (error) {
+        console.log(error);
         setRemainingDays(0);
       }
     }

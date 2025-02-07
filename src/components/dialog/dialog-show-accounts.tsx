@@ -1,5 +1,5 @@
 import { AccountBalance, UserInfo } from "@/types";
-import { ArrowUpRight, Loader, X } from "lucide-react";
+import { ArrowUpRight, Loader } from "lucide-react";
 import {
   Dialog,
   DialogClose,
@@ -112,7 +112,9 @@ export function DialogShowAccounts(props: DialogShowAccountsProps) {
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-md" hideCloseBtn>
         <DialogHeader>
-          <DialogTitle>Modification des soldes de l'utilisateur</DialogTitle>
+          <DialogTitle>
+            Modification des soldes de l&apos;utilisateur
+          </DialogTitle>
           <DialogDescription></DialogDescription>
         </DialogHeader>
         <Form {...form}>

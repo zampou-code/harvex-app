@@ -9,7 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useCallback, useEffect, useState } from "react";
 import { getDownloadURL, ref } from "firebase/storage";
 
 import { Button } from "@/components/ui/button";
@@ -30,7 +30,7 @@ export function DialogShowKyc(props: DialogShowKycProps) {
   const [open, setOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const loadKYC = async () => {
+  const loadKYC = useCallback(async () => {
     const kycfile = user?.kyc?.file;
 
     if (!kycfile) return;
@@ -41,11 +41,11 @@ export function DialogShowKyc(props: DialogShowKycProps) {
       setKyc(url);
     } finally {
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     loadKYC();
-  }, [user]);
+  }, [user, loadKYC]);
 
   const handleKYCStatus = async (status: "approved" | "rejected") => {
     try {
@@ -94,7 +94,7 @@ export function DialogShowKyc(props: DialogShowKycProps) {
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-md" hideCloseBtn>
         <DialogHeader>
-          <DialogTitle>Vérification KYC de l'utilisateur</DialogTitle>
+          <DialogTitle>Vérification KYC de l&apos;utilisateur</DialogTitle>
           <DialogDescription></DialogDescription>
         </DialogHeader>
 

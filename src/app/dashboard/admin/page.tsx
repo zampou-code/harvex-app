@@ -1,6 +1,5 @@
 "use client";
 
-import { AccountBalance, Transaction, UserInfo } from "@/types";
 import {
   Breadcrumb,
   BreadcrumbItem,

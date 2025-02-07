@@ -50,7 +50,7 @@ export default function HeroBanner() {
               CHOISIR UN PACK
             </h2>
             <p className="text-xs">
-              Sélectionnez parmi nos packs d'investissement adaptés à vos
+              Sélectionnez parmi nos packs d&apos;investissement adaptés à vos
               besoins et à votre budget.
             </p>
           </div>
@@ -75,7 +75,7 @@ export default function HeroBanner() {
             </h2>
             <p className="text-xs">
               Bénéficiez de vos profits selon les termes de votre contrat
-              d'investissement.
+              d&apos;investissement.
             </p>
           </div>
         </div>
