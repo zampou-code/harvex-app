@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useEffect, useState } from "react";
 
-import { AppSidebar } from "@/components/sidebar/app-sidebar";
+import { AppSidebarAdmin } from "@/components/sidebar/app-sidebar-admin";
 import { Separator } from "@/components/ui/separator";
 import { TableAdminTransactions } from "@/components/tables/table-admin-transactions";
 import { Transaction } from "@/types";
@@ -27,7 +27,7 @@ export default function Page() {
   const fetchTransactions = async () => {
     try {
       setLoading(true);
-      const response = await fetch("/api/transactions");
+      const response = await fetch("/api/admin/transactions");
 
       const json = await response.json();
 
@@ -61,7 +61,7 @@ export default function Page() {
 
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <AppSidebarAdmin />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2">
           <div className="flex items-center gap-2 px-4 lg:px-10 w-full">

@@ -208,6 +208,7 @@ export function TableAction(props: TableActionProps) {
       const json = await res.json();
 
       if (json?.state) {
+        window.dispatchEvent(new CustomEvent("user-info-updated"));
         window.dispatchEvent(new CustomEvent("transaction-admin-updated"));
       }
 
@@ -233,7 +234,9 @@ export function TableAction(props: TableActionProps) {
       const json = await res.json();
 
       if (json?.state) {
+        window.dispatchEvent(new CustomEvent("user-info-updated"));
         window.dispatchEvent(new CustomEvent("transaction-admin-updated"));
+
         enqueueSnackbar("Transaction annulée avec succès", {
           variant: "success",
           preventDuplicate: true,

@@ -1,20 +1,42 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/firebase-admin";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { createHash } from "crypto";
+import { db } from "@/lib/firebase-admin";
 
 export async function POST(request: Request) {
   try {
     const { email, password } = await request?.json();
-    const user = await signInWithEmailAndPassword(auth, email, password);
+
+    const userDoc = await db
+      .collection("users")
+      .where("email", "==", email)
+      .get();
+
+    if (userDoc.empty) {
+      return NextResponse.json(
+        { state: false, message: "Utilisateur non trouvé" },
+        { status: 404 }
+      );
+    }
+
+    const userData = userDoc.docs[0].data();
+    const hashedPassword = createHash("sha256").update(password).digest("hex");
+
+    if (hashedPassword !== userData.password) {
+      return NextResponse.json(
+        { state: false, message: "Mot de passe incorrect" },
+        { status: 401 }
+      );
+    }
 
     return NextResponse.json(
       {
         state: true,
         data: {
-          id: user.user.uid,
-          email: user.user.email,
-          message: "Login firebase successful",
+          role: userData.role,
+          email: userData.email,
+          id: userDoc.docs[0].id,
         },
+        message: "Login firebase successful",
       },
       { status: 200 }
     );
@@ -23,7 +45,7 @@ export async function POST(request: Request) {
       {
         error,
         state: false,
-        data: { message: "Invalid identifier or password" },
+        message: "Invalid identifier or password",
       },
       { status: 500 }
     );

@@ -135,7 +135,7 @@ export function RegisterForm({
       const json = await res.json();
 
       if (json?.state) {
-        router.push("/login");
+        router.push("/dashboard");
       } else {
         enqueueSnackbar(
           "Une erreur s'est produite lors de l'inscription. Veuillez vérifier vos informations et réessayer.",

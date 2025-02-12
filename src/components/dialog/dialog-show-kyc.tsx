@@ -28,7 +28,8 @@ export function DialogShowKyc(props: DialogShowKycProps) {
   const { user, children, onOpenChange } = props;
   const [kyc, setKyc] = useState<string>("");
   const [open, setOpen] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<"approved" | "rejected" | "">("");
+  // const [loading, setLoading] = useState<boolean>(false);
 
   const loadKYC = useCallback(async () => {
     const kycfile = user?.kyc?.file;
@@ -49,7 +50,8 @@ export function DialogShowKyc(props: DialogShowKycProps) {
 
   const handleKYCStatus = async (status: "approved" | "rejected") => {
     try {
-      setLoading(true);
+      setLoading(status);
+      // setLoading(true);
 
       if (user?.kyc?.file && status == "rejected") {
         const oldFileRef = ref(storage, user.kyc.file);
@@ -87,7 +89,7 @@ export function DialogShowKyc(props: DialogShowKycProps) {
         anchorOrigin: { vertical: "top", horizontal: "center" },
       });
     } finally {
-      setLoading(false);
+      setLoading("");
     }
   };
 
@@ -127,12 +129,20 @@ export function DialogShowKyc(props: DialogShowKycProps) {
             variant="destructive"
             onClick={() => handleKYCStatus("rejected")}
           >
-            {loading ? <Loader className="animate-spin" /> : <X />}
+            {loading === "rejected" ? (
+              <Loader className="animate-spin" />
+            ) : (
+              <X />
+            )}
             Rejeter
           </Button>
 
           <Button onClick={() => handleKYCStatus("approved")}>
-            {loading ? <Loader className="animate-spin" /> : <CheckCheck />}
+            {loading === "approved" ? (
+              <Loader className="animate-spin" />
+            ) : (
+              <CheckCheck />
+            )}
             Approuver
           </Button>
         </DialogFooter>

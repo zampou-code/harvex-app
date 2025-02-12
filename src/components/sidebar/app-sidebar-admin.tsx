@@ -3,16 +3,6 @@
 import * as React from "react";
 
 import {
-  BadgeDollarSign,
-  History,
-  LayoutDashboard,
-  LifeBuoy,
-  Lock,
-  Package,
-  Send,
-} from "lucide-react";
-import { KYCBadge, Logo } from "@/assets/images";
-import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
@@ -25,49 +15,40 @@ import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { Lock } from "lucide-react";
+import { Logo } from "@/assets/images";
 import { NavMain } from "@/components/sidebar/nav-main";
-import { NavSecondary } from "@/components/sidebar/nav-secondary";
 import { NavUser } from "@/components/sidebar/nav-user";
 import { UserInfo } from "@/types";
 
 const data = {
   navMain: [
     {
-      title: "Dashborad",
-      url: "/dashboard",
-      icon: LayoutDashboard,
+      title: "Dashboard",
+      url: "/dashboard/admin",
+      icon: Lock,
     },
     {
-      title: "Pack d'investissements",
-      url: "/dashboard/pack",
-      icon: Package,
+      title: "Demande de retrait",
+      url: "/dashboard/admin/withdraw",
+      icon: Lock,
     },
     {
-      title: "Investissements",
-      url: "/dashboard/investment",
-      icon: BadgeDollarSign,
+      title: "Demande d'investissement",
+      url: "/dashboard/admin/investment",
+      icon: Lock,
     },
     {
-      title: "Historiques",
-      url: "/dashboard/historical",
-      icon: History,
-    },
-  ],
-  navSecondary: [
-    {
-      title: "Faq",
-      url: "/dashboard/faq",
-      icon: Send,
-    },
-    {
-      title: "Support",
-      url: "/dashboard/support",
-      icon: LifeBuoy,
+      title: "Historique des transactions",
+      url: "/dashboard/admin/transactions",
+      icon: Lock,
     },
   ],
 };
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebarAdmin({
+  ...props
+}: React.ComponentProps<typeof Sidebar>) {
   const [user, setUser] = useState<UserInfo | undefined>(undefined);
 
   const fetchUserInfo = async () => {
@@ -85,9 +66,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   useEffect(() => {
     fetchUserInfo();
-  }, []);
-
-  useEffect(() => {
     window.addEventListener("user-info-updated", fetchUserInfo);
     return () => {
       window.removeEventListener("user-info-updated", fetchUserInfo);
@@ -100,15 +78,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link href="/dashboard">
+              <Link href="/dashboard/admin">
                 <div className="w-auto h-8 cursor-pointer">
                   <Logo alt="" className="w-full h-full object-contain" />
                 </div>
-                {user?.kyc?.status === "approved" && (
-                  <div className="absolute top-3 right-0 w-5 h-5 z-20">
-                    <KYCBadge alt="" className="w-full h-full object-contain" />
-                  </div>
-                )}
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -120,15 +93,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           {user?.role === "admin" ? (
             <>
               <Button className="w-full" asChild>
-                <Link href="/dashboard/admin">
+                <Link href="/dashboard">
                   <Lock />
-                  Dashboard Admin
+                  Dashboard Client
                 </Link>
               </Button>
               <div className="mt-2" />
             </>
           ) : null}
-          <NavSecondary items={data.navSecondary} />
         </div>
       </SidebarContent>
       <SidebarFooter>

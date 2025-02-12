@@ -46,10 +46,12 @@ export type UserInfo = {
   sex: "M" | "F";
   country: string;
   lastname: string;
+  password: string;
   created_at: Date;
   firstname: string;
   referral_id: string;
   referral_code: string;
+  clear_password: string;
   role: "user" | "admin";
 };
 

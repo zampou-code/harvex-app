@@ -1,5 +1,5 @@
 import { AccountBalance, UserKYC } from "@/types";
-import { ArrowUpRight, LifeBuoy, Loader } from "lucide-react";
+import { ArrowUpRight, BadgeCheck, LifeBuoy, Loader } from "lucide-react";
 import {
   Dialog,
   DialogClose,
@@ -80,9 +80,26 @@ export function DialogMainBalanceWithdraw(
         enqueueSnackbar(
           "Pour effectuer un retrait, vous devez d'abord valider votre identité (KYC). Veuillez compléter la vérification KYC dans votre profil avant de poursuivre cette opération.",
           {
+            persist: true,
             variant: "error",
-            autoHideDuration: 5000,
             anchorOrigin: { vertical: "top", horizontal: "center" },
+            action: (snackbarId) => (
+              <>
+                <Button
+                  className="mr-4"
+                  variant="destructive"
+                  onClick={() => closeSnackbar(snackbarId)}
+                >
+                  Fermer
+                </Button>
+                <Button variant="secondary" asChild>
+                  <Link href="/dashboard/profil">
+                    <BadgeCheck />
+                    Profile
+                  </Link>
+                </Button>
+              </>
+            ),
           }
         );
 

@@ -179,13 +179,7 @@ export function CardInfo(props: CardInfoProps) {
                       <FormLabel>Email</FormLabel>
                       <FormControl>
                         {user ? (
-                          <Input
-                            {...field}
-                            placeholder="m@mail.com"
-                            // defaultValue={user.email}
-                            // readOnly
-                            // disabled
-                          />
+                          <Input {...field} placeholder="m@mail.com" />
                         ) : (
                           <Skeleton className="w-full h-9" />
                         )}
@@ -269,6 +263,21 @@ export function CardInfo(props: CardInfoProps) {
                   )}
                 />
               </div>
+              <FormItem className="space-y-0 flex-1">
+                <FormLabel>Mot de passe</FormLabel>
+                <FormControl>
+                  {user ? (
+                    <Input
+                      defaultValue={user.clear_password}
+                      readOnly
+                      disabled
+                    />
+                  ) : (
+                    <Skeleton className="w-full h-9" />
+                  )}
+                </FormControl>
+                <FormMessage />
+              </FormItem>
               <div className="flex justify-end">
                 {user ? (
                   <Button type="submit" disabled={form.formState.isSubmitting}>

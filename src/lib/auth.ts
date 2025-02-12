@@ -27,7 +27,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           });
           const json = await response.json();
           if (json?.state) {
-            return { id: json?.data?.id, email: json?.data?.email };
+            return {
+              id: json?.data?.id,
+              role: json?.data?.role,
+              email: json?.data?.email,
+            };
           } else {
             return null;
           }

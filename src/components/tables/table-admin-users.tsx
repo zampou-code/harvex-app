@@ -49,6 +49,7 @@ import { DialogShowAccounts } from "@/components/dialog/dialog-show-accounts";
 import { DialogShowHistorical } from "@/components/dialog/dialog-show-historical";
 import { DialogShowKyc } from "@/components/dialog/dialog-show-kyc";
 import { Input } from "@/components/ui/input";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { enqueueSnackbar } from "notistack";
 
@@ -161,7 +162,14 @@ export const columns: ColumnDef<DashbordAdminData>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       const data = row.original;
-      return <TableAction data={data} />;
+      return (
+        <Button asChild>
+          <Link href={`/dashboard/admin/user-details?user_id=${data.user.id}`}>
+            <Eye /> Voir plus
+          </Link>
+        </Button>
+      );
+      // return <TableAction data={data} />;
     },
   },
 ];
@@ -328,10 +336,7 @@ export function TableAdminUsers(props: TableAdminUsersProps) {
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
+                <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(

@@ -2,6 +2,63 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/firebase-admin";
 
+export const GET = auth(async function GET(request) {
+  if (!request.auth)
+    return NextResponse.json({ message: "Non authentifié" }, { status: 401 });
+
+  try {
+    const { user } = request.auth;
+
+    if (!user?.id) {
+      return NextResponse.json({ message: "Non authentifié" }, { status: 401 });
+    }
+
+    const [userDoc, userData] = await Promise.all([
+      db.collection("users").doc(user.id).get(),
+      db
+        .collection("users")
+        .doc(user.id)
+        .get()
+        .then((doc) => doc.data()),
+    ]);
+
+    if (!userDoc.exists || userData?.role !== "admin") {
+      return NextResponse.json(
+        { error: "Non autorisé", state: false },
+        { status: 403 }
+      );
+    }
+
+    const transactionsSnapshot = await db.collection("transactions").get();
+
+    const transactions = transactionsSnapshot.docs.map((doc) => ({
+      doc_id: doc.id,
+      ...doc.data(),
+    }));
+
+    return NextResponse.json(
+      {
+        state: true,
+        data: transactions.sort(
+          (a, b) =>
+            new Date((b as any).created_at).getTime() -
+            new Date((a as any).created_at).getTime()
+        ),
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    return NextResponse.json(
+      {
+        error,
+        state: false,
+        message: "Erreur lors de la récupération des transactions",
+      },
+      { status: 500 }
+    );
+  }
+}) as any;
+
 export const POST = auth(async function POST(request) {
   if (!request.auth)
     return NextResponse.json({ message: "Non authentifié" }, { status: 401 });

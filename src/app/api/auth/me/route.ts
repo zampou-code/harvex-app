@@ -60,7 +60,7 @@ export const POST = auth(async function POST(request) {
 
     await db
       .collection("users")
-      .doc(user_id)
+      .doc(data?.user_id)
       .update({
         ...data,
       });

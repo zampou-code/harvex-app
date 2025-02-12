@@ -182,9 +182,13 @@ export const POST = auth(async function POST(request) {
     }
 
     if (type === "update-kyc-status" && user && status) {
-      await db.collection("users").doc(user.id).update({
-        "kyc.status": status,
-      });
+      await db
+        .collection("users")
+        .doc(user.id)
+        .update({
+          "kyc.status": status,
+          "kyc.file": status == "rejected" ? "" : user?.kyc.file,
+        });
 
       return NextResponse.json(
         { state: true, message: "Statut KYC mis à jour" },

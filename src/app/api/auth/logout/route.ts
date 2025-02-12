@@ -1,11 +1,8 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/firebase-admin";
-import { signOut as fireSignOut } from "firebase/auth";
 import { signOut } from "@/lib/auth";
 
 export async function GET() {
   try {
-    await fireSignOut(auth);
     await signOut({ redirect: false });
 
     return NextResponse.json(

@@ -26,21 +26,25 @@ import { UserInfo } from "@/types";
 export default function Page() {
   const [user, setUser] = useState<UserInfo | undefined>(undefined);
 
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
-        const response = await fetch("/api/auth/me");
+  const fetchUserInfo = async () => {
+    try {
+      const response = await fetch("/api/auth/me");
 
-        const json = await response.json();
+      const json = await response.json();
 
-        if (json?.state) {
-          setUser(json?.data);
-        }
-      } finally {
+      if (json?.state) {
+        setUser(json?.data);
       }
-    };
+    } finally {
+    }
+  };
 
+  useEffect(() => {
     fetchUserInfo();
+    window.addEventListener("user-info-updated", fetchUserInfo);
+    return () => {
+      window.removeEventListener("user-info-updated", fetchUserInfo);
+    };
   }, []);
 
   return (

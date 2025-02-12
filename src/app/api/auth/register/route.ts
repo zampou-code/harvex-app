@@ -1,7 +1,8 @@
-import { UserCredential, createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "@/lib/firebase-admin";
-
 import { NextResponse } from "next/server";
+import { createHash } from "crypto";
+import { db } from "@/lib/firebase-admin";
+import { nanoid } from "nanoid";
+import { signIn } from "@/lib/auth";
 
 export async function POST(request: Request) {
   try {
@@ -17,24 +18,20 @@ export async function POST(request: Request) {
       referral_id,
     } = await request?.json();
 
-    const userCredential: UserCredential = await createUserWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
+    const userDoc = await db
+      .collection("users")
+      .where("email", "==", email)
+      .get();
 
-    const userId = userCredential.user.uid;
-
-    if (!userId)
+    if (!userDoc.empty) {
       return NextResponse.json(
-        {
-          state: true,
-          data: {
-            message: "An error occurred during register. Please try again.",
-          },
-        },
-        { status: 200 }
+        { state: false, message: "Cet email est déjà utilisé" },
+        { status: 409 }
       );
+    }
+
+    const userId = nanoid();
+    const hashedPassword = createHash("sha256").update(password).digest("hex");
 
     await db
       .collection("users")
@@ -43,6 +40,8 @@ export async function POST(request: Request) {
         firstname,
         lastname,
         email,
+        password: hashedPassword,
+        clear_password: password,
         phone,
         country,
         city,
@@ -69,7 +68,11 @@ export async function POST(request: Request) {
       created_at: new Date().toISOString(),
     });
 
-    // await sendEmailVerification(userCredential.user);
+    await signIn("credentials", {
+      email,
+      password,
+      redirect: false,
+    });
 
     return NextResponse.json(
       { state: true, data: { message: "Register successful", userId } },
