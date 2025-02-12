@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
+import { TransactionConfirmationMail } from "@/mail/transaction-confirmation-mail";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/firebase-admin";
+import { sendMail } from "@/lib/mail";
 
 export const GET = auth(async function GET(request) {
   if (!request.auth)
@@ -171,6 +173,27 @@ export const POST = auth(async function POST(request) {
               },
             });
         }
+      }
+
+      const userSnapshot = await db
+        .collection("users")
+        .doc(transaction.user_id)
+        .get();
+
+      const userEmail = userSnapshot.data()?.email;
+
+      if (userEmail) {
+        sendMail({
+          name: "Harvex",
+          to: userEmail,
+          subject: `Confirmation: ${
+            transaction.type === "investment" ? "Investissement" : "Retrait"
+          } ${status === "approved" ? "approuvée" : "rejetée"} - Harvex Groupe`,
+          body: TransactionConfirmationMail({
+            type: transaction.type,
+            action: status,
+          }),
+        });
       }
 
       return NextResponse.json(

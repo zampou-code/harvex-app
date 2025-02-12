@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
+import { TransactionMail } from "@/mail/transaction-mail";
 import { addDays } from "date-fns";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/firebase-admin";
 import { nanoid } from "nanoid";
+import { sendMail } from "@/lib/mail";
 
 export const GET = auth(async function GET(request) {
   if (!request.auth)
@@ -49,6 +51,7 @@ export const POST = auth(async function POST(request) {
 
   try {
     const user_id = request.auth.user?.id;
+    const email = request.auth.user?.email;
 
     const { amount, type, account, pack, payment_mean, action, investment } =
       await request.json();
@@ -106,7 +109,14 @@ export const POST = auth(async function POST(request) {
       }
     }
 
-    if (type === "withdraw" && user_id && amount && account && payment_mean) {
+    if (
+      type === "withdraw" &&
+      user_id &&
+      email &&
+      amount &&
+      account &&
+      payment_mean
+    ) {
       const accountSnapshot = await db
         .collection("accounts")
         .where("user_id", "==", user_id)
@@ -140,6 +150,16 @@ export const POST = auth(async function POST(request) {
           created_at: new Date().toISOString(),
         });
 
+        sendMail({
+          to: email,
+          name: "Harvex",
+          subject: "Demande de retrait en attente - Harvex Groupe",
+          body: TransactionMail({
+            type,
+            action: "demand",
+          }),
+        });
+
         return NextResponse.json(
           {
             state: true,
@@ -156,6 +176,7 @@ export const POST = auth(async function POST(request) {
     if (
       type === "investment" &&
       user_id &&
+      email &&
       amount &&
       account &&
       action &&
@@ -185,6 +206,16 @@ export const POST = auth(async function POST(request) {
               end_date: addDays(new Date(), pack?.number_of_day).toISOString(),
             },
             created_at: new Date().toISOString(),
+          });
+
+          sendMail({
+            to: email,
+            name: "Harvex",
+            subject: "Demande d'investissement - Harvex Groupe",
+            body: TransactionMail({
+              type,
+              action: "demand",
+            }),
           });
 
           return NextResponse.json(
@@ -266,13 +297,23 @@ export const POST = auth(async function POST(request) {
             }
           }
 
+          sendMail({
+            to: email,
+            name: "Harvex",
+            subject: "Investissement effectué avec succès - Harvex Groupe",
+            body: TransactionMail({
+              type,
+              action: "account",
+            }),
+          });
+
           return NextResponse.json(
             {
               state: true,
               data: {
                 id: transactionRef.id,
               },
-              message: `Félicitations ! Votre investissement a été effectué avec succès. Vous recevrez bientôt les détails de votre placement.`,
+              message: `Félicitations ! Votre investissement a été effectué avec succès.`,
             },
             { status: 201 }
           );
