@@ -61,10 +61,6 @@ export function CardPassword(props: CardPasswordProps) {
 
       const json = await response.json();
 
-      if (json?.state) {
-        form.reset();
-      }
-
       enqueueSnackbar(json?.message, {
         autoHideDuration: 5000,
         variant: json?.state ? "success" : "error",

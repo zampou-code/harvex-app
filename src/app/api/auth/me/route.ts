@@ -22,10 +22,12 @@ export const GET = auth(async function GET(request) {
       );
     }
     const userData = userDoc.data();
+
     return NextResponse.json(
       {
         state: true,
         data: {
+          id: user_id,
           ...userData,
         },
         message: "User information retrieved successfully",
