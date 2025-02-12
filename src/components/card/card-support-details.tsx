@@ -6,20 +6,27 @@ import { Headset, Mail } from "lucide-react";
 export function CardSupportDetails() {
   return (
     <Card className="md:h-[calc(100%-25px)]">
-      <CardContent className="pt-6 space-y-5">
+      <CardContent className="pt-6 space-y-10">
         <div>
           <div className="flex justify-between items-center">
-            <h2 className="text-sm font-bold">Contact 1</h2>
+            <h2 className="text-sm font-bold">Support 1</h2>
             <Headset className="h-4 w-4 text-muted-foreground" />
           </div>
-          <p className="text-xl font-bold text-primary">+225 0707070707</p>
+          <p className="text-xl font-bold text-primary">+225 0713065959</p>
         </div>
         <div>
           <div className="flex justify-between items-center">
-            <h2 className="text-sm font-bold">Contact 2</h2>
+            <h2 className="text-sm font-bold">Support 2</h2>
             <Headset className="h-4 w-4 text-muted-foreground" />
           </div>
-          <p className="text-xl font-bold text-primary">+225 0707070707</p>
+          <p className="text-xl font-bold text-primary">+225 0718101078</p>
+        </div>
+        <div>
+          <div className="flex justify-between items-center">
+            <h2 className="text-sm font-bold">Support 3</h2>
+            <Headset className="h-4 w-4 text-muted-foreground" />
+          </div>
+          <p className="text-xl font-bold text-primary">+223 70 62 56 84</p>
         </div>
         <div>
           <div className="flex justify-between items-center">
@@ -27,7 +34,7 @@ export function CardSupportDetails() {
             <Mail className="h-4 w-4 text-muted-foreground" />
           </div>
           <p className="text-xl font-bold text-primary">
-            support@harvexgroup.com
+            contact@harvexgroupe.com
           </p>
         </div>
         <div>

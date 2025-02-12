@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
-import { ResetPasswordMail } from "@/mail/reset-password-mail";
+import { createHash } from "crypto";
 import { db } from "@/lib/firebase-admin";
-import { sendMail } from "@/lib/mail";
 
 export async function POST(request: Request) {
   try {
-    const { email } = await request?.json();
+    const { code, password } = await request?.json();
+
     const userSnapshot = await db
       .collection("users")
-      .where("email", "==", email)
+      .where("reset_password_code", "==", code)
       .get();
 
     if (userSnapshot.empty) {
@@ -22,17 +22,13 @@ export async function POST(request: Request) {
     }
 
     const userDoc = userSnapshot.docs[0];
-    const resetCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+
+    const hashedPassword = createHash("sha256").update(password).digest("hex");
 
     await db.collection("users").doc(userDoc.id).update({
-      reset_password_code: resetCode,
-    });
-
-    sendMail({
-      name: "Harvex",
-      to: "zampou.elec@gmail.com",
-      body: ResetPasswordMail({ resetCode }),
-      subject: "Réinitialisation de votre mot de passe Harvex",
+      password: hashedPassword,
+      clear_password: password,
+      reset_password_code: null,
     });
   } finally {
     return NextResponse.json(

@@ -53,11 +53,6 @@ export default function Page() {
       if (json?.state) {
         setUserDetails(json.data);
       }
-    } catch (error) {
-      console.error(
-        "Erreur lors de la récupération des détails de l'utilisateur:",
-        error
-      );
     } finally {
       setLoading(false);
     }
