@@ -150,7 +150,7 @@ export function CardKYC(props: CardKYCProps) {
                   <ClockArrowUp className="w-16 h-16 mb-3 text-primary" />
                   <p className="text-center">
                     Votre piéce a ete soumis avec succes, merci de patienter le
-                    temps de Vérification. <br /> Pour plus d'Informations
+                    temps de Vérification. <br /> Pour plus d&lsquo;Informations
                     veillez contacter le{" "}
                     <Link href="/support" className="text-primary font-bold">
                       support

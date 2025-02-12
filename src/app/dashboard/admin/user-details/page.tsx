@@ -14,7 +14,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { AppSidebarAdmin } from "@/components/sidebar/app-sidebar-admin";
 import { CardAccounts } from "@/components/card/admin/card-accounts";
@@ -34,7 +34,7 @@ export default function Page() {
     null
   );
 
-  const fetchUserDetails = async () => {
+  const fetchUserDetails = useCallback(async () => {
     try {
       if (!userId) return;
       console.log(userId);
@@ -61,7 +61,7 @@ export default function Page() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
 
   useEffect(() => {
     fetchUserDetails();
@@ -69,7 +69,7 @@ export default function Page() {
     return () => {
       window.removeEventListener("user-info-updated", fetchUserDetails);
     };
-  }, [userId]);
+  }, [fetchUserDetails]);
 
   return (
     <SidebarProvider>
@@ -86,14 +86,16 @@ export default function Page() {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Details de l'utilisateur</BreadcrumbPage>
+                  <BreadcrumbPage>
+                    Details de l&lsquo;utilisateur
+                  </BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 lg:px-10 pt-0">
-          <h2 className="text-sm font-bold">Details de l'utilisateur</h2>
+          <h2 className="text-sm font-bold">Details de l&lsquo;utilisateur</h2>
 
           {userDetails ? (
             <div className="space-y-4">

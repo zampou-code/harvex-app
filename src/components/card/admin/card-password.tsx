@@ -15,7 +15,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UserInfo } from "@/types";
-import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useSnackbar } from "notistack";
 import { z } from "zod";
@@ -74,8 +73,8 @@ export function CardPassword(props: CardPasswordProps) {
       <CardContent className="pt-6">
         <div className="mb-4">
           <p className="text-sm text-muted-foreground">
-            Pour modifier le mot de passe de l'utilisateur, veuillez saisir un
-            nouveau mot de passe ci-dessous.
+            Pour modifier le mot de passe de l&lsquo;utilisateur, veuillez
+            saisir un nouveau mot de passe ci-dessous.
           </p>
         </div>
         <Form {...form}>
