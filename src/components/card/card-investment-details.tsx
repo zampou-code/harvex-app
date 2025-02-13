@@ -108,7 +108,7 @@ export function CardInvestmentDetails(props: CardInvestmentDetailsProps) {
             />
           </div>
 
-          <div className="w-7 h-7 rounded-lg bg-primary flex justify-center items-center">
+          <div className="w-7 h-7 rounded-lg bg-primary flex justify-center items-center animate-pulse">
             <DollarSign className="h-4 w-4 text-muted-foreground text-white" />
           </div>
         </div>
@@ -123,7 +123,6 @@ export function CardInvestmentDetails(props: CardInvestmentDetailsProps) {
               format={{
                 currency: "XOF",
                 style: "currency",
-                currencySign: "accounting",
                 trailingZeroDisplay: "stripIfInteger",
               }}
             />

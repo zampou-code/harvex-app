@@ -39,6 +39,11 @@ const data = {
       icon: Lock,
     },
     {
+      title: "Verification de piece",
+      url: "/dashboard/admin/kyc",
+      icon: Lock,
+    },
+    {
       title: "Historique des transactions",
       url: "/dashboard/admin/transactions",
       icon: Lock,

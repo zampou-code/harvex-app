@@ -25,7 +25,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { UserInfo } from "@/types";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { useSnackbar } from "notistack";
+// import { useSnackbar } from "notistack";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -74,7 +74,7 @@ type CardInfoProps = {
 
 export function CardInfo(props: CardInfoProps) {
   const { user } = props;
-  const { enqueueSnackbar } = useSnackbar();
+  // const { enqueueSnackbar } = useSnackbar();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -101,6 +101,7 @@ export function CardInfo(props: CardInfoProps) {
   }, [user, form]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log(values);
     // try {
     //   const res = await fetch("/api/auth/me", {
     //     method: "POST",

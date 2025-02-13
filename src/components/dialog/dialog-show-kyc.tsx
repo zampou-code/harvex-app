@@ -29,7 +29,6 @@ export function DialogShowKyc(props: DialogShowKycProps) {
   const [kyc, setKyc] = useState<string>("");
   const [open, setOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<"approved" | "rejected" | "">("");
-  // const [loading, setLoading] = useState<boolean>(false);
 
   const loadKYC = useCallback(async () => {
     const kycfile = user?.kyc?.file;
@@ -51,7 +50,6 @@ export function DialogShowKyc(props: DialogShowKycProps) {
   const handleKYCStatus = async (status: "approved" | "rejected") => {
     try {
       setLoading(status);
-      // setLoading(true);
 
       if (user?.kyc?.file && status == "rejected") {
         const oldFileRef = ref(storage, user.kyc.file);
@@ -104,7 +102,7 @@ export function DialogShowKyc(props: DialogShowKycProps) {
       }}
     >
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-md" hideCloseBtn>
+      <DialogContent className="sm:max-w-md max-h-[90%]" hideCloseBtn>
         <DialogHeader>
           <DialogTitle>Vérification KYC de l&apos;utilisateur</DialogTitle>
           <DialogDescription></DialogDescription>

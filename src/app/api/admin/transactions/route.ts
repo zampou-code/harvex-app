@@ -113,12 +113,12 @@ export const POST = auth(async function POST(request) {
 
         if (userSnapshot.exists) {
           const userData = userSnapshot.data();
-          const referralCode = userData?.referral_code;
+          const referralId = userData?.referral_id;
 
-          if (referralCode) {
+          if (referralId) {
             const referrerSnapshot = await db
               .collection("users")
-              .where("referral_code", "==", referralCode)
+              .where("referral_code", "==", referralId)
               .get();
 
             if (!referrerSnapshot.empty) {
