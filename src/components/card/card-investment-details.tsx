@@ -86,8 +86,31 @@ export function CardInvestmentDetails(props: CardInvestmentDetailsProps) {
             {investment?.pack?.name}
           </CardTitle>
         </div>
-        <div className="w-7 h-7 rounded-lg bg-primary flex justify-center items-center">
-          <DollarSign className="h-4 w-4 text-muted-foreground text-white" />
+        <div className="flex-1 flex justify-end items-center gap-4">
+          <div>
+            <p className="text-[10px] -mb-1">Compte courant</p>
+            <Countdown
+              date={investment?.pack?.end_date}
+              onComplete={() => setIsForward(true)}
+              renderer={() => (
+                <NumberFlow
+                  className="text-[14px] font-bold"
+                  value={Number(profit.toFixed(2)) || 0}
+                  format={{
+                    currency: "XOF",
+                    style: "currency",
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                    trailingZeroDisplay: "stripIfInteger",
+                  }}
+                />
+              )}
+            />
+          </div>
+
+          <div className="w-7 h-7 rounded-lg bg-primary flex justify-center items-center">
+            <DollarSign className="h-4 w-4 text-muted-foreground text-white" />
+          </div>
         </div>
       </CardHeader>
       <CardContent className="p-4 pt-2">
@@ -100,6 +123,7 @@ export function CardInvestmentDetails(props: CardInvestmentDetailsProps) {
               format={{
                 currency: "XOF",
                 style: "currency",
+                currencySign: "accounting",
                 trailingZeroDisplay: "stripIfInteger",
               }}
             />
@@ -129,7 +153,7 @@ export function CardInvestmentDetails(props: CardInvestmentDetailsProps) {
           </div>
         </div>
         <div className="mt-2 flex flex-wrap justify-between items-end gap-2">
-          <div>
+          {/* <div>
             <p className="text-xs">Temps restant</p>
             <Countdown
               date={investment?.pack?.end_date}
@@ -148,7 +172,7 @@ export function CardInvestmentDetails(props: CardInvestmentDetailsProps) {
                 />
               )}
             />
-          </div>
+          </div> */}
           {isForward ? (
             <Button
               className="flex-1"

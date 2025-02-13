@@ -10,7 +10,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Loader, Save } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -20,7 +19,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -103,29 +101,26 @@ export function CardInfo(props: CardInfoProps) {
   }, [user, form]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      const res = await fetch("/api/auth/me", {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-        },
-        body: JSON.stringify({ ...values, user_id: user?.id }),
-      });
-
-      const json = await res.json();
-
-      if (json?.state) {
-        window.dispatchEvent(new CustomEvent("user-info-updated"));
-      }
-
-      enqueueSnackbar(json?.message, {
-        variant: json?.state ? "success" : "error",
-        preventDuplicate: true,
-        autoHideDuration: 5000,
-        anchorOrigin: { vertical: "top", horizontal: "center" },
-      });
-    } finally {
-    }
+    // try {
+    //   const res = await fetch("/api/auth/me", {
+    //     method: "POST",
+    //     headers: {
+    //       Accept: "application/json",
+    //     },
+    //     body: JSON.stringify({ ...values, user_id: user?.id }),
+    //   });
+    //   const json = await res.json();
+    //   if (json?.state) {
+    //     window.dispatchEvent(new CustomEvent("user-info-updated"));
+    //   }
+    //   enqueueSnackbar(json?.message, {
+    //     variant: json?.state ? "success" : "error",
+    //     preventDuplicate: true,
+    //     autoHideDuration: 5000,
+    //     anchorOrigin: { vertical: "top", horizontal: "center" },
+    //   });
+    // } finally {
+    // }
   }
 
   return (
@@ -143,7 +138,12 @@ export function CardInfo(props: CardInfoProps) {
                       <FormLabel>Nom</FormLabel>
                       <FormControl>
                         {user ? (
-                          <Input placeholder="John" {...field} />
+                          <Input
+                            placeholder="John"
+                            {...field}
+                            readOnly
+                            disabled
+                          />
                         ) : (
                           <Skeleton className="w-full h-9" />
                         )}
@@ -160,7 +160,12 @@ export function CardInfo(props: CardInfoProps) {
                       <FormLabel>Prénom(s)</FormLabel>
                       <FormControl>
                         {user ? (
-                          <Input placeholder="Doe" {...field} />
+                          <Input
+                            placeholder="Doe"
+                            {...field}
+                            readOnly
+                            disabled
+                          />
                         ) : (
                           <Skeleton className="w-full h-9" />
                         )}
@@ -183,8 +188,8 @@ export function CardInfo(props: CardInfoProps) {
                             {...field}
                             placeholder="m@mail.com"
                             // defaultValue={user.email}
-                            // readOnly
-                            // disabled
+                            readOnly
+                            disabled
                           />
                         ) : (
                           <Skeleton className="w-full h-9" />
@@ -210,6 +215,8 @@ export function CardInfo(props: CardInfoProps) {
                               if (!country) return;
                               form.setValue("country", country);
                             }}
+                            readOnly
+                            disabled
                           />
                         ) : (
                           <Skeleton className="w-full h-9" />
@@ -229,7 +236,12 @@ export function CardInfo(props: CardInfoProps) {
                       <FormLabel>Ville</FormLabel>
                       <FormControl>
                         {user ? (
-                          <Input placeholder="Cassablanca" {...field} />
+                          <Input
+                            placeholder="Cassablanca"
+                            {...field}
+                            readOnly
+                            disabled
+                          />
                         ) : (
                           <Skeleton className="w-full h-9" />
                         )}
@@ -253,6 +265,7 @@ export function CardInfo(props: CardInfoProps) {
                           <SelectTrigger
                             className="w-[120px]"
                             style={{ opacity: user ? 1 : 0 }}
+                            disabled
                           >
                             <SelectValue />
                           </SelectTrigger>
@@ -269,7 +282,7 @@ export function CardInfo(props: CardInfoProps) {
                   )}
                 />
               </div>
-              <div className="flex justify-end">
+              {/* <div className="flex justify-end">
                 {user ? (
                   <Button type="submit" disabled={form.formState.isSubmitting}>
                     {form.formState.isSubmitting ? (
@@ -282,7 +295,7 @@ export function CardInfo(props: CardInfoProps) {
                 ) : (
                   <Skeleton className="w-40 h-9" />
                 )}
-              </div>
+              </div> */}
             </div>
           </form>
         </Form>
