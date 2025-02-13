@@ -1,5 +1,7 @@
+import { InvestmentConfirmationMail } from "@/mail/client/investment-confirmation-mail";
+import { InvestmentDemandMail } from "@/mail/client/investment-demand-mail";
 import { NextResponse } from "next/server";
-import { TransactionMail } from "@/mail/transaction-mail";
+import { WithdrawalDemandMail } from "@/mail/client/withdrawal-demand-mail";
 import { addDays } from "date-fns";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/firebase-admin";
@@ -52,6 +54,19 @@ export const POST = auth(async function POST(request) {
   try {
     const user_id = request.auth.user?.id;
     const email = request.auth.user?.email;
+
+    const userDoc = await db
+      .collection("users")
+      .doc(user_id as string)
+      .get();
+
+    if (!userDoc.exists) {
+      return NextResponse.json(
+        { state: false, message: "Utilisateur non trouvé" },
+        { status: 404 }
+      );
+    }
+    const userData = userDoc.data();
 
     const { amount, type, account, pack, payment_mean, action, investment } =
       await request.json();
@@ -152,10 +167,19 @@ export const POST = auth(async function POST(request) {
 
         sendMail({
           to: email,
-          subject: "Demande de retrait en attente - Harvex Groupe",
-          body: TransactionMail({
-            type,
-            action: "demand",
+          subject: "Demande de retrait de fonds - HARVEX GROUPE",
+          body: WithdrawalDemandMail({
+            name: `${userData?.firstname} ${userData?.lastname}`,
+            amount: Number(amount),
+            method: payment_mean,
+            accountNumber: accountData.id,
+            date: new Date().toLocaleString("fr-FR", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
           }),
         });
 
@@ -209,10 +233,13 @@ export const POST = auth(async function POST(request) {
 
           sendMail({
             to: email,
-            subject: "Demande d'investissement - Harvex Groupe",
-            body: TransactionMail({
-              type,
-              action: "demand",
+            subject: "Demande d'investissement chez HARVEX GROUPE",
+            body: InvestmentDemandMail({
+              name: `${userData?.firstname} ${userData?.lastname}`,
+              packName: pack?.name,
+              amount: Number(pack?.amount),
+              duration: pack?.number_of_day,
+              estimatedAmount: Number(pack?.roi),
             }),
           });
 
@@ -297,10 +324,15 @@ export const POST = auth(async function POST(request) {
 
           sendMail({
             to: email,
-            subject: "Investissement effectué avec succès - Harvex Groupe",
-            body: TransactionMail({
-              type,
-              action: "account",
+            subject: "Confirmation de votre investissement chez HARVEX GROUPE",
+            body: InvestmentConfirmationMail({
+              name: `${userData?.firstname} ${userData?.lastname}`,
+              packName: pack?.name,
+              amount: Number(pack?.amount),
+              duration: pack?.number_of_day,
+              estimatedAmount: Number(pack?.roi),
+              startDate: new Date().toISOString(),
+              endDate: addDays(new Date(), pack?.number_of_day).toISOString(),
             }),
           });
 

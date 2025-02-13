@@ -64,28 +64,32 @@ export default function Page() {
 
   const handleDeleteTransaction = async () => {
     try {
-      setDeleteLoading(true);
+      const conf = confirm(
+        "Êtes-vous certain de vouloir supprimer définitivement cet utilisateur ? Cette action est irréversible et supprimera toutes les données associées."
+      );
+      if (conf) {
+        setDeleteLoading(true);
+        const res = await fetch("/api/admin/users", {
+          method: "POST",
+          body: JSON.stringify({
+            type: "delete-user",
+            user: userDetails?.user,
+          }),
+        });
 
-      const res = await fetch("/api/admin/users", {
-        method: "POST",
-        body: JSON.stringify({
-          type: "delete-user",
-          user: userDetails?.user,
-        }),
-      });
+        const json = await res.json();
 
-      const json = await res.json();
+        if (json?.state) {
+          window.dispatchEvent(new CustomEvent("user-admin-updated"));
+        }
 
-      if (json?.state) {
-        window.dispatchEvent(new CustomEvent("user-admin-updated"));
+        enqueueSnackbar(json?.message, {
+          preventDuplicate: true,
+          autoHideDuration: 5000,
+          variant: json?.state ? "success" : "error",
+          anchorOrigin: { vertical: "top", horizontal: "center" },
+        });
       }
-
-      enqueueSnackbar(json?.message, {
-        preventDuplicate: true,
-        autoHideDuration: 5000,
-        variant: json?.state ? "success" : "error",
-        anchorOrigin: { vertical: "top", horizontal: "center" },
-      });
     } finally {
       setDeleteLoading(false);
     }

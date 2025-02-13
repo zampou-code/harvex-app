@@ -171,26 +171,28 @@ export function TableAction(props: TableActionProps) {
 
   const handleDeleteTransaction = async () => {
     try {
-      const res = await fetch("/api/admin/users", {
-        method: "POST",
-        body: JSON.stringify({
-          user: data.user,
-          type: "delete-user",
-        }),
-      });
-
-      const json = await res.json();
-
-      if (json?.state) {
-        window.dispatchEvent(new CustomEvent("user-admin-updated"));
+      const conf = confirm(
+        "Êtes-vous certain de vouloir supprimer définitivement cet utilisateur ? Cette action est irréversible et supprimera toutes les données associées."
+      );
+      if (conf) {
+        const res = await fetch("/api/admin/users", {
+          method: "POST",
+          body: JSON.stringify({
+            user: data.user,
+            type: "delete-user",
+          }),
+        });
+        const json = await res.json();
+        if (json?.state) {
+          window.dispatchEvent(new CustomEvent("user-admin-updated"));
+        }
+        enqueueSnackbar(json?.message, {
+          preventDuplicate: true,
+          autoHideDuration: 5000,
+          variant: json?.state ? "success" : "error",
+          anchorOrigin: { vertical: "top", horizontal: "center" },
+        });
       }
-
-      enqueueSnackbar(json?.message, {
-        preventDuplicate: true,
-        autoHideDuration: 5000,
-        variant: json?.state ? "success" : "error",
-        anchorOrigin: { vertical: "top", horizontal: "center" },
-      });
     } finally {
     }
   };

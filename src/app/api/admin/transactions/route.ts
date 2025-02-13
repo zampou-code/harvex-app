@@ -1,5 +1,6 @@
+import { InvestmentConfirmationMail } from "@/mail/client/investment-confirmation-mail";
 import { NextResponse } from "next/server";
-import { TransactionConfirmationMail } from "@/mail/transaction-confirmation-mail";
+import { addDays } from "date-fns";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/firebase-admin";
 import { sendMail } from "@/lib/mail";
@@ -91,7 +92,7 @@ export const POST = auth(async function POST(request) {
     const { type, status, transaction } = await request.json();
 
     if (type === "delete-transaction" && transaction) {
-      await db.collection("transactions").doc(transaction.id).delete();
+      await db.collection("transactions").doc(transaction.doc_id).delete();
 
       return NextResponse.json(
         { message: "Transaction supprimée avec succès", state: true },
@@ -149,6 +150,23 @@ export const POST = auth(async function POST(request) {
                 });
             }
           }
+
+          sendMail({
+            to: userData?.email,
+            subject: "Confirmation de votre investissement chez HARVEX GROUPE",
+            body: InvestmentConfirmationMail({
+              name: `${userData?.firstname} ${userData?.lastname}`,
+              packName: transaction?.pack?.name,
+              amount: Number(transaction?.pack?.amount),
+              duration: transaction?.pack?.number_of_day,
+              estimatedAmount: Number(transaction?.pack?.roi),
+              startDate: new Date().toISOString(),
+              endDate: addDays(
+                new Date(),
+                transaction?.pack?.number_of_day
+              ).toISOString(),
+            }),
+          });
         }
       }
 
@@ -173,26 +191,6 @@ export const POST = auth(async function POST(request) {
               },
             });
         }
-      }
-
-      const userSnapshot = await db
-        .collection("users")
-        .doc(transaction.user_id)
-        .get();
-
-      const userEmail = userSnapshot.data()?.email;
-
-      if (userEmail) {
-        sendMail({
-          to: userEmail,
-          subject: `Confirmation: ${
-            transaction.type === "investment" ? "Investissement" : "Retrait"
-          } ${status === "approved" ? "approuvée" : "rejetée"} - Harvex Groupe`,
-          body: TransactionConfirmationMail({
-            type: transaction.type,
-            action: status,
-          }),
-        });
       }
 
       return NextResponse.json(

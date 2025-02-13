@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
+import { WelcomeMail } from "@/mail/client/welcome-mail";
 import { createHash } from "crypto";
 import { db } from "@/lib/firebase-admin";
 import { nanoid } from "nanoid";
+import { sendMail } from "@/lib/mail";
 import { signIn } from "@/lib/auth";
 
 export async function POST(request: Request) {
@@ -72,6 +74,13 @@ export async function POST(request: Request) {
       email,
       password,
       redirect: false,
+    });
+
+    sendMail({
+      to: email,
+      body: WelcomeMail({ name: `${firstname} ${lastname}` }),
+      subject:
+        "Bienvenue chez HARVEX GROUPE - Votre aventure financière commence maintenant !",
     });
 
     return NextResponse.json(
