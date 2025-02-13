@@ -102,20 +102,22 @@ export function DialogShowKyc(props: DialogShowKycProps) {
       }}
     >
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-md max-h-[90%]" hideCloseBtn>
+      <DialogContent className="sm:max-w-md  overflow-scroll" hideCloseBtn>
         <DialogHeader>
           <DialogTitle>Vérification KYC de l&apos;utilisateur</DialogTitle>
           <DialogDescription></DialogDescription>
         </DialogHeader>
 
         {kyc && (
-          <Image
-            src={kyc}
-            alt=""
-            className="w-full h-full object-contain"
-            width={500}
-            height={300}
-          />
+          <div className="w-full h-[700px] bg-red-400">
+            <Image
+              alt=""
+              src={kyc}
+              width={500}
+              height={300}
+              className="w-full h-full object-contain"
+            />
+          </div>
         )}
         <DialogFooter className="sm:justify-end mt-3 max-md:gap-2">
           <DialogClose asChild>
