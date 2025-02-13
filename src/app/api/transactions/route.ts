@@ -152,7 +152,6 @@ export const POST = auth(async function POST(request) {
 
         sendMail({
           to: email,
-          name: "Harvex",
           subject: "Demande de retrait en attente - Harvex Groupe",
           body: TransactionMail({
             type,
@@ -210,7 +209,6 @@ export const POST = auth(async function POST(request) {
 
           sendMail({
             to: email,
-            name: "Harvex",
             subject: "Demande d'investissement - Harvex Groupe",
             body: TransactionMail({
               type,
@@ -299,7 +297,6 @@ export const POST = auth(async function POST(request) {
 
           sendMail({
             to: email,
-            name: "Harvex",
             subject: "Investissement effectué avec succès - Harvex Groupe",
             body: TransactionMail({
               type,

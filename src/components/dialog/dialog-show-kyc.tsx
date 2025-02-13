@@ -1,7 +1,6 @@
 import { CheckCheck, Loader, X } from "lucide-react";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -102,14 +101,14 @@ export function DialogShowKyc(props: DialogShowKycProps) {
       }}
     >
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-md  overflow-scroll" hideCloseBtn>
+      <DialogContent className="sm:max-w-md max-h-[85%] overflow-scroll">
         <DialogHeader>
           <DialogTitle>Vérification KYC de l&apos;utilisateur</DialogTitle>
           <DialogDescription></DialogDescription>
         </DialogHeader>
 
         {kyc && (
-          <div className="w-full h-[700px] bg-red-400">
+          <div className="w-full h-[600px] bg-gray-400">
             <Image
               alt=""
               src={kyc}
@@ -119,14 +118,10 @@ export function DialogShowKyc(props: DialogShowKycProps) {
             />
           </div>
         )}
-        <DialogFooter className="sm:justify-end mt-3 max-md:gap-2">
-          <DialogClose asChild>
-            <Button type="button" variant="destructive-outline">
-              Fermer
-            </Button>
-          </DialogClose>
+        <DialogFooter className="justify-end mt-3 max-md:gap-2 flex-row">
           <Button
             variant="destructive"
+            className="flex-1"
             onClick={() => handleKYCStatus("rejected")}
           >
             {loading === "rejected" ? (
@@ -137,7 +132,10 @@ export function DialogShowKyc(props: DialogShowKycProps) {
             Rejeter
           </Button>
 
-          <Button onClick={() => handleKYCStatus("approved")}>
+          <Button
+            className="flex-1"
+            onClick={() => handleKYCStatus("approved")}
+          >
             {loading === "approved" ? (
               <Loader className="animate-spin" />
             ) : (

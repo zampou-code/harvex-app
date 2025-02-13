@@ -57,7 +57,7 @@ export type UserInfo = {
 
 export type Referrals = {
   count: number;
-  referals: UserInfo[];
+  referrals: UserInfo[];
 };
 
 export type AccountBalance = {

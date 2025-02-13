@@ -67,8 +67,8 @@ export function TableGodchildren(props: TableGodchildrenProps) {
   const [rowSelection, setRowSelection] = useState({});
 
   useEffect(() => {
-    if (referrals?.referals) {
-      setData(referrals.referals);
+    if (referrals?.referrals) {
+      setData(referrals.referrals);
     }
   }, [referrals]);
 

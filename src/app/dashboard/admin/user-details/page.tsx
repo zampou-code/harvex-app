@@ -9,6 +9,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Loader, Loader2, Trash } from "lucide-react";
 import {
   SidebarInset,
   SidebarProvider,
@@ -17,19 +18,22 @@ import {
 import { useCallback, useEffect, useState } from "react";
 
 import { AppSidebarAdmin } from "@/components/sidebar/app-sidebar-admin";
+import { Button } from "@/components/ui/button";
 import { CardAccounts } from "@/components/card/admin/card-accounts";
 import { CardInfo } from "@/components/card/admin/card-info";
 import { CardShowKyc } from "@/components/card/admin/card-show-kyc";
 import { DashbordAdminData } from "@/components/tables/table-admin-users";
-import { Loader2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { TableAdminTransactions } from "@/components/tables/table-admin-transactions";
+import { enqueueSnackbar } from "notistack";
 import { useSearchParams } from "next/navigation";
 
 export default function Page() {
   const searchParams = useSearchParams();
   const userId = searchParams.get("user_id");
   const [loading, setLoading] = useState(true);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
   const [userDetails, setUserDetails] = useState<DashbordAdminData | null>(
     null
   );
@@ -57,6 +61,35 @@ export default function Page() {
       setLoading(false);
     }
   }, [userId]);
+
+  const handleDeleteTransaction = async () => {
+    try {
+      setDeleteLoading(true);
+
+      const res = await fetch("/api/admin/users", {
+        method: "POST",
+        body: JSON.stringify({
+          type: "delete-user",
+          user: userDetails?.user,
+        }),
+      });
+
+      const json = await res.json();
+
+      if (json?.state) {
+        window.dispatchEvent(new CustomEvent("user-admin-updated"));
+      }
+
+      enqueueSnackbar(json?.message, {
+        preventDuplicate: true,
+        autoHideDuration: 5000,
+        variant: json?.state ? "success" : "error",
+        anchorOrigin: { vertical: "top", horizontal: "center" },
+      });
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchUserDetails();
@@ -111,6 +144,25 @@ export default function Page() {
                     loading={loading}
                     transactions={userDetails.transactions}
                   />
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Supprimer l&apos;utilisateur</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Button
+                    variant="destructive"
+                    className="w-full"
+                    onClick={handleDeleteTransaction}
+                  >
+                    {deleteLoading ? (
+                      <Loader className="animate-spin" />
+                    ) : (
+                      <Trash />
+                    )}
+                    Supprimer l&apos;utilisateur
+                  </Button>
                 </CardContent>
               </Card>
             </div>

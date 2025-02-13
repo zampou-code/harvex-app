@@ -184,7 +184,6 @@ export const POST = auth(async function POST(request) {
 
       if (userEmail) {
         sendMail({
-          name: "Harvex",
           to: userEmail,
           subject: `Confirmation: ${
             transaction.type === "investment" ? "Investissement" : "Retrait"

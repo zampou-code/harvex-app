@@ -6,14 +6,12 @@ import { sendMail } from "@/lib/mail";
 export async function GET() {
   try {
     // sendMail({
-    //   name: "Harvex",
     //   body: TestMail(),
     //   subject: "Harvex",
     //   to: "zampou.elec@gmail.com",
     // });
 
     sendMail({
-      name: "Harvex",
       to: "zampou.elec@gmail.com",
       body: ResetPasswordMail({ resetCode: "000000" }),
       subject: "Réinitialisation de votre mot de passe Harvex",

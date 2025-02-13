@@ -34,7 +34,11 @@ export const columns: ColumnDef<Transaction>[] = [
   {
     accessorKey: "id",
     header: () => <div className="text-left">ID</div>,
-    cell: ({ row }) => <div className="capitalize">{row.getValue("id")}</div>,
+    cell: ({ row }) => (
+      <div className="capitalize">
+        {(row.getValue("id") as string)?.slice(0, 5)}
+      </div>
+    ),
   },
   {
     accessorKey: "type",

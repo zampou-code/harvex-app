@@ -6,12 +6,9 @@ import {
   ArrowLeftToLine,
   ArrowRight,
   ArrowRightToLine,
-  DollarSign,
   Eye,
-  IdCard,
   Inbox,
   Loader,
-  MoreHorizontal,
   Trash,
 } from "lucide-react";
 import {
@@ -45,9 +42,6 @@ import { useEffect, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { DialogShowAccounts } from "@/components/dialog/dialog-show-accounts";
-import { DialogShowHistorical } from "@/components/dialog/dialog-show-historical";
-import { DialogShowKyc } from "@/components/dialog/dialog-show-kyc";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -111,16 +105,6 @@ export const columns: ColumnDef<DashbordAdminData>[] = [
     },
   },
   {
-    id: "role",
-    accessorFn: (row) => row.user.role,
-    header: () => <div className="text-left">Rôle</div>,
-    cell: ({ row }) => {
-      const role = row.getValue("role");
-      const frenchRole = role === "user" ? "Client" : "Admin.";
-      return <div>{frenchRole}</div>;
-    },
-  },
-  {
     id: "kycStatus",
     accessorFn: (row) => row.user.kyc.status,
     header: () => <div className="text-left">Statut KYC</div>,
@@ -163,13 +147,17 @@ export const columns: ColumnDef<DashbordAdminData>[] = [
     cell: ({ row }) => {
       const data = row.original;
       return (
-        <Button asChild>
-          <Link href={`/dashboard/admin/user-details?user_id=${data.user.id}`}>
-            <Eye /> Voir plus
-          </Link>
-        </Button>
+        <div className="flex gap-1">
+          <Button asChild>
+            <Link
+              href={`/dashboard/admin/user-details?user_id=${data.user.id}`}
+            >
+              <Eye /> Voir plus
+            </Link>
+          </Button>
+          <TableAction data={data} />
+        </div>
       );
-      // return <TableAction data={data} />;
     },
   },
 ];
@@ -180,10 +168,6 @@ type TableActionProps = {
 
 export function TableAction(props: TableActionProps) {
   const { data } = props;
-
-  const [modal1, setModal1] = useState<boolean>(false);
-  const [modal2, setModal2] = useState<boolean>(false);
-  const [modal3, setModal3] = useState<boolean>(false);
 
   const handleDeleteTransaction = async () => {
     try {
@@ -212,39 +196,15 @@ export function TableAction(props: TableActionProps) {
   };
 
   return (
-    <DropdownMenu open={modal1 || modal2 || modal3 ? true : undefined}>
+    <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="h-8 w-8 p-0">
+        <Button>
           <span className="sr-only">Ouvrir le menu</span>
-          <MoreHorizontal />
+          <Trash />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-        {data.user.kyc.file && (
-          <DialogShowKyc user={data.user} onOpenChange={setModal1}>
-            <DropdownMenuItem>
-              <IdCard /> Voir le KYC
-            </DropdownMenuItem>
-          </DialogShowKyc>
-        )}
-        <DialogShowAccounts
-          user={data.user}
-          account={data.account}
-          onOpenChange={setModal2}
-        >
-          <DropdownMenuItem>
-            <DollarSign /> Modifer le compte
-          </DropdownMenuItem>
-        </DialogShowAccounts>
-        <DialogShowHistorical
-          onOpenChange={setModal3}
-          transactions={data.transactions}
-        >
-          <DropdownMenuItem>
-            <Eye /> l&apos;historique des tran.
-          </DropdownMenuItem>
-        </DialogShowHistorical>
         {data.user.role !== "admin" && (
           <DropdownMenuItem
             className="text-red-500"

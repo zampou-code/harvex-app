@@ -4,12 +4,11 @@ import { render } from "@react-email/components";
 
 type sendMailType = {
   to: string;
-  name: string;
   subject: string;
   body: ReactElement;
 };
 
-export async function sendMail({ to, name, subject, body }: sendMailType) {
+export async function sendMail({ to, subject, body }: sendMailType) {
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: 465,
@@ -26,11 +25,10 @@ export async function sendMail({ to, name, subject, body }: sendMailType) {
     await transporter.verify();
     const options = {
       to,
-      name,
       subject,
       html: emailHtml,
-      from: "no-reply@harvexgroupe.com",
-    };
+      from: '"Harvex Groupe" <no-reply@harvexgroupe.com>',
+    } satisfies nodemailer.SendMailOptions;
 
     await transporter.sendMail(options);
   } catch (error) {

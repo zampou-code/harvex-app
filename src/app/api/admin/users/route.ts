@@ -35,6 +35,10 @@ export const GET = auth(async function GET(request) {
     for (const doc of usersSnapshot.docs) {
       const userData = doc.data();
 
+      if (userData.role === "admin") {
+        continue;
+      }
+
       const transactionsSnapshot = await db
         .collection("transactions")
         .where("user_id", "==", doc.id)

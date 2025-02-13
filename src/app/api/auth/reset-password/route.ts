@@ -29,7 +29,6 @@ export async function POST(request: Request) {
     });
 
     sendMail({
-      name: "Harvex",
       to: "zampou.elec@gmail.com",
       body: ResetPasswordMail({ resetCode }),
       subject: "Réinitialisation de votre mot de passe Harvex",
