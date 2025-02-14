@@ -31,6 +31,7 @@ export async function sendMail({ to, subject, body }: sendMailType) {
     } satisfies nodemailer.SendMailOptions;
 
     await transporter.sendMail(options);
+    console.log("success email send");
   } catch (error) {
     console.error("error email send: ", error);
     throw error;
