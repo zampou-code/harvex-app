@@ -166,25 +166,27 @@ export const POST = auth(async function POST(request) {
         });
 
         console.log("email: ", email);
+        console.log("Demande de retrait de fonds - HARVEX GROUPE");
 
-        await sendMail({
-          // to: "zampou.elec@gmail.com",
-          to: email,
-          subject: "Demande de retrait de fonds - HARVEX GROUPE",
-          body: WithdrawalDemandMail({
-            name: `${userData?.firstname} ${userData?.lastname}`,
-            amount: Number(amount),
-            method: payment_mean,
-            accountNumber: accountData.id,
-            date: new Date().toLocaleString("fr-FR", {
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
+        if (email) {
+          await sendMail({
+            to: email,
+            subject: "Demande de retrait de fonds - HARVEX GROUPE",
+            body: WithdrawalDemandMail({
+              name: `${userData?.firstname} ${userData?.lastname}`,
+              amount: Number(amount),
+              method: payment_mean,
+              accountNumber: accountData.id,
+              date: new Date().toLocaleString("fr-FR", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              }),
             }),
-          }),
-        });
+          });
+        }
 
         return NextResponse.json(
           {
