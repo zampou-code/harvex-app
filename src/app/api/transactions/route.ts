@@ -173,7 +173,7 @@ export const POST = auth(async function POST(request) {
             name: `${userData?.firstname} ${userData?.lastname}`,
             amount: Number(amount),
             method: payment_mean,
-            accountNumber: accountData.id,
+            accountNumber: accountDoc.id.slice(0, 6),
             date: new Date().toLocaleString("fr-FR", {
               day: "numeric",
               month: "long",
@@ -233,7 +233,7 @@ export const POST = auth(async function POST(request) {
           });
 
           await sendMail({
-            to: email,
+            to: userData?.email,
             subject: "Demande d'investissement chez HARVEX GROUPE",
             body: InvestmentDemandMail({
               name: `${userData?.firstname} ${userData?.lastname}`,
@@ -324,7 +324,7 @@ export const POST = auth(async function POST(request) {
           }
 
           await sendMail({
-            to: email,
+            to: userData?.email,
             subject: "Confirmation de votre investissement chez HARVEX GROUPE",
             body: InvestmentConfirmationMail({
               name: `${userData?.firstname} ${userData?.lastname}`,
