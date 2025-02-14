@@ -28,7 +28,7 @@ export async function POST(request: Request) {
       reset_password_code: resetCode,
     });
 
-    sendMail({
+    await sendMail({
       to: "zampou.elec@gmail.com",
       body: ResetPasswordMail({ resetCode }),
       subject: "Réinitialisation de votre mot de passe Harvex",

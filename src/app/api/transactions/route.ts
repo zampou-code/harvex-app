@@ -165,7 +165,7 @@ export const POST = auth(async function POST(request) {
           created_at: new Date().toISOString(),
         });
 
-        sendMail({
+        await sendMail({
           to: email,
           subject: "Demande de retrait de fonds - HARVEX GROUPE",
           body: WithdrawalDemandMail({
@@ -231,7 +231,7 @@ export const POST = auth(async function POST(request) {
             created_at: new Date().toISOString(),
           });
 
-          sendMail({
+          await sendMail({
             to: email,
             subject: "Demande d'investissement chez HARVEX GROUPE",
             body: InvestmentDemandMail({
@@ -322,7 +322,7 @@ export const POST = auth(async function POST(request) {
             }
           }
 
-          sendMail({
+          await sendMail({
             to: email,
             subject: "Confirmation de votre investissement chez HARVEX GROUPE",
             body: InvestmentConfirmationMail({

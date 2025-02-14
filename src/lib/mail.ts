@@ -10,23 +10,14 @@ type sendMailType = {
 
 export async function sendMail({ to, subject, body }: sendMailType) {
   const transporter = nodemailer.createTransport({
-    host: "mail.harvexgroupe.com",
+    host: process.env.SMTP_HOST,
     port: 465,
     secure: true,
     auth: {
-      pass: "qK9*@jVnZY11!mv",
-      user: "no-reply@harvexgroupe.com",
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASSWORD,
     },
   });
-  // const transporter = nodemailer.createTransport({
-  //   host: process.env.SMTP_HOST,
-  //   port: 465,
-  //   secure: true,
-  //   auth: {
-  //     user: process.env.SMTP_USER,
-  //     pass: process.env.SMTP_PASSWORD,
-  //   },
-  // });
 
   const emailHtml = await render(body);
 

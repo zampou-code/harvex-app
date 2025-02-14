@@ -70,7 +70,7 @@ export async function POST(request: Request) {
       created_at: new Date().toISOString(),
     });
 
-    sendMail({
+    await sendMail({
       to: email,
       body: WelcomeMail({ name: `${firstname} ${lastname}` }),
       subject:

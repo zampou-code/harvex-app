@@ -151,7 +151,7 @@ export const POST = auth(async function POST(request) {
             }
           }
 
-          sendMail({
+          await sendMail({
             to: userData?.email,
             subject: "Confirmation de votre investissement chez HARVEX GROUPE",
             body: InvestmentConfirmationMail({
