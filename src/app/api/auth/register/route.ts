@@ -70,12 +70,6 @@ export async function POST(request: Request) {
       created_at: new Date().toISOString(),
     });
 
-    await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
-
     sendMail({
       to: email,
       body: WelcomeMail({ name: `${firstname} ${lastname}` }),
@@ -83,8 +77,21 @@ export async function POST(request: Request) {
         "Bienvenue chez HARVEX GROUPE - Votre aventure financière commence maintenant !",
     });
 
+    await signIn("credentials", {
+      email,
+      password,
+      redirect: false,
+    });
+
     return NextResponse.json(
-      { state: true, data: { message: "Register successful", userId } },
+      {
+        state: true,
+        data: {
+          userId,
+        },
+        message:
+          "Félicitations ! Votre inscription a été effectuée avec succès. Bienvenue dans la communauté Harvex Groupe. Vous pouvez maintenant accéder à votre espace personnel et commencer votre aventure d'investissement.",
+      },
       { status: 200 }
     );
   } catch (error) {
@@ -93,7 +100,8 @@ export async function POST(request: Request) {
         error,
         state: false,
         data: {
-          message: "An error occurred during register. Please try again.",
+          message:
+            "Une erreur s'est produite lors de l'inscription. Veuillez vérifier vos informations et réessayer.",
         },
       },
       { status: 500 }

@@ -1,11 +1,9 @@
 import { Link, Tailwind, Text } from "@react-email/components";
 
-import React from "react";
-
 export function WelcomeMail({ name }: { name: string }) {
   return (
     <Tailwind>
-      <Text className="text-base leading-relaxed text-gray-700 mb-5">
+      <Text className="text-base leading-relaxed text-gray-700 capitalize mb-5">
         Cher(e) {name},
       </Text>
       <Text className="text-base leading-relaxed text-gray-700 mb-5">
@@ -16,8 +14,8 @@ export function WelcomeMail({ name }: { name: string }) {
       <Text className="text-base leading-relaxed text-gray-700 mb-5">
         Ce que vous pouvez faire dès maintenant :
       </Text>
-      <Text className="text-base leading-relaxed text-gray-700 mb-5">
-        ✅ Accédez à votre compte en vous connectant ici :
+      <Text className="text-base leading-relaxed text-gray-700">
+        ✅ Accédez à votre compte en vous connectant ici :{" "}
         <Link
           className="text-[#e25c1d]"
           href="https://www.harvexgroupe.com/login"
@@ -25,17 +23,17 @@ export function WelcomeMail({ name }: { name: string }) {
           https://www.harvexgroupe.com/login
         </Link>
       </Text>
-      <Text className="text-base leading-relaxed text-gray-700 mb-5">
+      <Text className="text-base leading-relaxed text-gray-700">
         ✅ Explorez nos différentes opportunités d&apos;investissement adaptées
         à vos objectifs financiers
       </Text>
       <Text className="text-base leading-relaxed text-gray-700 mb-5">
-        ✅ Contactez notre service client pour toute question à l&apos;adresse
-        contact@harvexgroupe.com
+        ✅ Contactez notre service client pour toute question à l&apos;adresse{" "}
+        <Text className="text-[#e25c1d]">contact@harvexgroupe.com</Text>
       </Text>
       <Text className="text-base leading-relaxed text-gray-700 mb-5">
         📲 Rejoignez notre communauté Telegram pour rester informé de nos offres
-        et actualités :
+        et actualités :{" "}
         <Link href="https://t.me/harvexgroupe" className="text-[#e25c1d]">
           https://t.me/harvexgroupe
         </Link>

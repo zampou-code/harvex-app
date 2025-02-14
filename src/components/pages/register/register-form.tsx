@@ -136,17 +136,14 @@ export function RegisterForm({
 
       if (json?.state) {
         router.push("/dashboard");
-      } else {
-        enqueueSnackbar(
-          "Une erreur s'est produite lors de l'inscription. Veuillez vérifier vos informations et réessayer.",
-          {
-            variant: "error",
-            preventDuplicate: true,
-            autoHideDuration: 3000,
-            anchorOrigin: { vertical: "top", horizontal: "center" },
-          }
-        );
       }
+
+      enqueueSnackbar(json?.message, {
+        preventDuplicate: true,
+        autoHideDuration: 3000,
+        variant: json?.state ? "success" : "error",
+        anchorOrigin: { vertical: "top", horizontal: "center" },
+      });
     } finally {
     }
   }
