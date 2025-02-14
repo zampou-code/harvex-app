@@ -1,30 +1,22 @@
 import { NextResponse } from "next/server";
-// import { ResetPasswordMail } from "@/mail/reset-password-mail";
 import { WelcomeMail } from "@/mail/client/welcome-mail";
-// import { TestMail } from "@/mail/test-mail";
+import { auth } from "@/lib/auth";
 import { sendMail } from "@/lib/mail";
 
-export async function GET() {
+export const GET = auth(async function GET(request) {
   try {
+    const email = request.auth?.user?.email;
+    console.log("email: ", email);
+
     await sendMail({
-      to: "zampou.elec@gmail.com",
+      to: email as string,
+      // to: "zampou.elec@gmail.com",
       body: WelcomeMail({ name: "Jean François" }),
       subject:
         "Bienvenue chez HARVEX GROUPE - Votre aventure financière commence maintenant !",
     });
+
     console.log("success email send");
-
-    // sendMail({
-    //   body: TestMail(),
-    //   subject: "Harvex",
-    //   to: "zampou.elec@gmail.com",
-    // });
-
-    // sendMail({
-    //   to: "zampou.elec@gmail.com",
-    //   body: ResetPasswordMail({ resetCode: "000000" }),
-    //   subject: "Réinitialisation de votre mot de passe Harvex",
-    // });
 
     return NextResponse.json(
       {
@@ -46,4 +38,4 @@ export async function GET() {
       { status: 500 }
     );
   }
-}
+});
