@@ -29,9 +29,9 @@ export async function POST(request: Request) {
     });
 
     await sendMail({
-      to: "zampou.elec@gmail.com",
+      to: email,
       body: ResetPasswordMail({ resetCode }),
-      subject: "Réinitialisation de votre mot de passe Harvex",
+      subject: "Réinitialisation de votre mot de passe Harvex Groupe",
     });
   } finally {
     return NextResponse.json(
