@@ -1,3 +1,4 @@
+import Email from "vercel-email";
 import { InvestmentConfirmationMail } from "@/mail/client/investment-confirmation-mail";
 import { InvestmentDemandMail } from "@/mail/client/investment-demand-mail";
 import { NextResponse } from "next/server";
@@ -6,7 +7,9 @@ import { addDays } from "date-fns";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/firebase-admin";
 import { nanoid } from "nanoid";
-import { sendMail } from "@/lib/mail";
+// import { sendMail } from "@/lib/mail";
+
+export const runtime = "edge";
 
 export const GET = auth(async function GET(request) {
   if (!request.auth)
@@ -166,25 +169,32 @@ export const POST = auth(async function POST(request) {
           created_at: new Date().toISOString(),
         });
 
-        await sendMail({
+        await Email.send({
           to: email,
-          // to: userData?.email,
-          subject: "Demande de retrait de fonds - HARVEX GROUPE",
-          body: WithdrawalDemandMail({
-            name: `${userData?.firstname} ${userData?.lastname}`,
-            amount: Number(amount),
-            method: payment_mean,
-            accountNumber: "123456789",
-            // accountNumber: accountDoc.id.slice(0, 6),
-            date: new Date().toLocaleString("fr-FR", {
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-            }),
-          }),
+          text: "Hello World",
+          subject: "Hello World",
+          from: { email: "no-reply@harvexgroupe.com", name: "Harvex Groupe" },
         });
+
+        // await sendMail({
+        //   to: email,
+        //   // to: userData?.email,
+        //   subject: "Demande de retrait de fonds - HARVEX GROUPE",
+        //   body: WithdrawalDemandMail({
+        //     name: `${userData?.firstname} ${userData?.lastname}`,
+        //     amount: Number(amount),
+        //     method: payment_mean,
+        //     accountNumber: "123456789",
+        //     // accountNumber: accountDoc.id.slice(0, 6),
+        //     date: new Date().toLocaleString("fr-FR", {
+        //       day: "numeric",
+        //       month: "long",
+        //       year: "numeric",
+        //       hour: "2-digit",
+        //       minute: "2-digit",
+        //     }),
+        //   }),
+        // });
 
         return NextResponse.json(
           {
@@ -234,17 +244,17 @@ export const POST = auth(async function POST(request) {
             created_at: new Date().toISOString(),
           });
 
-          await sendMail({
-            to: userData?.email,
-            subject: "Demande d'investissement chez HARVEX GROUPE",
-            body: InvestmentDemandMail({
-              name: `${userData?.firstname} ${userData?.lastname}`,
-              packName: pack?.name,
-              amount: Number(pack?.amount),
-              duration: pack?.number_of_day,
-              estimatedAmount: Number(pack?.roi),
-            }),
-          });
+          // await sendMail({
+          //   to: userData?.email,
+          //   subject: "Demande d'investissement chez HARVEX GROUPE",
+          //   body: InvestmentDemandMail({
+          //     name: `${userData?.firstname} ${userData?.lastname}`,
+          //     packName: pack?.name,
+          //     amount: Number(pack?.amount),
+          //     duration: pack?.number_of_day,
+          //     estimatedAmount: Number(pack?.roi),
+          //   }),
+          // });
 
           return NextResponse.json(
             {
@@ -325,19 +335,19 @@ export const POST = auth(async function POST(request) {
             }
           }
 
-          await sendMail({
-            to: userData?.email,
-            subject: "Confirmation de votre investissement chez HARVEX GROUPE",
-            body: InvestmentConfirmationMail({
-              name: `${userData?.firstname} ${userData?.lastname}`,
-              packName: pack?.name,
-              amount: Number(pack?.amount),
-              duration: pack?.number_of_day,
-              estimatedAmount: Number(pack?.roi),
-              startDate: new Date().toISOString(),
-              endDate: addDays(new Date(), pack?.number_of_day).toISOString(),
-            }),
-          });
+          // await sendMail({
+          //   to: userData?.email,
+          //   subject: "Confirmation de votre investissement chez HARVEX GROUPE",
+          //   body: InvestmentConfirmationMail({
+          //     name: `${userData?.firstname} ${userData?.lastname}`,
+          //     packName: pack?.name,
+          //     amount: Number(pack?.amount),
+          //     duration: pack?.number_of_day,
+          //     estimatedAmount: Number(pack?.roi),
+          //     startDate: new Date().toISOString(),
+          //     endDate: addDays(new Date(), pack?.number_of_day).toISOString(),
+          //   }),
+          // });
 
           return NextResponse.json(
             {

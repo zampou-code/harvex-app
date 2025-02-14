@@ -158,6 +158,9 @@ importers:
       tailwindcss-animate:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.17)
+      vercel-email:
+        specifier: ^0.0.6
+        version: 0.0.6
       zod:
         specifier: ^3.24.1
         version: 3.24.1
@@ -3864,6 +3867,9 @@ packages:
   uuid@9.0.1:
     resolution: {integrity: sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==}
     hasBin: true
+
+  vercel-email@0.0.6:
+    resolution: {integrity: sha512-lpELZ8/B6qyLMUOzmvZiU5evo1Hv5jfSpI/rrzny5UYfOAUKFYycraXNT+fT/cC6ewUKQVJDg8/v3LwyX3cCzA==}
 
   victory-vendor@36.9.2:
     resolution: {integrity: sha512-PnpQQMuxlwYdocC8fIJqVXvkeViHYzotI+NJrCuav0ZYFoq912ZHBk3mCeuj+5/VpodOjPe1z0Fk2ihgzlXqjQ==}
@@ -8129,6 +8135,8 @@ snapshots:
     optional: true
 
   uuid@9.0.1: {}
+
+  vercel-email@0.0.6: {}
 
   victory-vendor@36.9.2:
     dependencies:
