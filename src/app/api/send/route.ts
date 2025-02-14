@@ -7,9 +7,10 @@ import { sendMail } from "@/lib/mail";
 export async function GET() {
   try {
     sendMail({
-      subject: "Harvex",
       to: "zampou.elec@gmail.com",
       body: WelcomeMail({ name: "Jean François" }),
+      subject:
+        "Bienvenue chez HARVEX GROUPE - Votre aventure financière commence maintenant !",
     });
 
     // sendMail({

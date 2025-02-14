@@ -1,7 +1,5 @@
 import { Link, Tailwind, Text } from "@react-email/components";
 
-import React from "react";
-
 export function InvestmentConfirmationMail({
   name,
   packName,
