@@ -32,7 +32,7 @@ export async function sendMail({ to, subject, body }: sendMailType) {
 
     await transporter.sendMail(options);
   } catch (error) {
-    console.log("error email send: ", error);
+    console.error("error email send: ", error);
     throw error;
   }
 }
