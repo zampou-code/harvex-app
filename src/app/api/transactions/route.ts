@@ -167,13 +167,15 @@ export const POST = auth(async function POST(request) {
         });
 
         await sendMail({
-          to: userData?.email,
+          to: email,
+          // to: userData?.email,
           subject: "Demande de retrait de fonds - HARVEX GROUPE",
           body: WithdrawalDemandMail({
             name: `${userData?.firstname} ${userData?.lastname}`,
             amount: Number(amount),
             method: payment_mean,
-            accountNumber: accountDoc.id.slice(0, 6),
+            accountNumber: "123456789",
+            // accountNumber: accountDoc.id.slice(0, 6),
             date: new Date().toLocaleString("fr-FR", {
               day: "numeric",
               month: "long",
