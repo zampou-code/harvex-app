@@ -66,6 +66,7 @@ export const POST = auth(async function POST(request) {
         { status: 404 }
       );
     }
+
     const userData = userDoc.data();
 
     const { amount, type, account, pack, payment_mean, action, investment } =
@@ -165,28 +166,23 @@ export const POST = auth(async function POST(request) {
           created_at: new Date().toISOString(),
         });
 
-        console.log("email: ", email);
-        console.log("Demande de retrait de fonds - HARVEX GROUPE");
-
-        if (email) {
-          await sendMail({
-            to: email,
-            subject: "Demande de retrait de fonds - HARVEX GROUPE",
-            body: WithdrawalDemandMail({
-              name: `${userData?.firstname} ${userData?.lastname}`,
-              amount: Number(amount),
-              method: payment_mean,
-              accountNumber: accountData.id,
-              date: new Date().toLocaleString("fr-FR", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              }),
+        await sendMail({
+          to: userData?.email,
+          subject: "Demande de retrait de fonds - HARVEX GROUPE",
+          body: WithdrawalDemandMail({
+            name: `${userData?.firstname} ${userData?.lastname}`,
+            amount: Number(amount),
+            method: payment_mean,
+            accountNumber: accountData.id,
+            date: new Date().toLocaleString("fr-FR", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
             }),
-          });
-        }
+          }),
+        });
 
         return NextResponse.json(
           {
