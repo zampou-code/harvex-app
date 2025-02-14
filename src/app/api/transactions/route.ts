@@ -1,15 +1,15 @@
-import Email from "vercel-email";
-import { InvestmentConfirmationMail } from "@/mail/client/investment-confirmation-mail";
-import { InvestmentDemandMail } from "@/mail/client/investment-demand-mail";
+// import Email from "vercel-email";
+// import { InvestmentConfirmationMail } from "@/mail/client/investment-confirmation-mail";
+// import { InvestmentDemandMail } from "@/mail/client/investment-demand-mail";
 import { NextResponse } from "next/server";
-import { WithdrawalDemandMail } from "@/mail/client/withdrawal-demand-mail";
+// import { WithdrawalDemandMail } from "@/mail/client/withdrawal-demand-mail";
 import { addDays } from "date-fns";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/firebase-admin";
 import { nanoid } from "nanoid";
 // import { sendMail } from "@/lib/mail";
 
-export const runtime = "edge";
+// export const runtime = "edge";
 
 export const GET = auth(async function GET(request) {
   if (!request.auth)
@@ -70,7 +70,7 @@ export const POST = auth(async function POST(request) {
       );
     }
 
-    const userData = userDoc.data();
+    // const userData = userDoc.data();
 
     const { amount, type, account, pack, payment_mean, action, investment } =
       await request.json();
@@ -168,12 +168,15 @@ export const POST = auth(async function POST(request) {
           payment_mean: payment_mean || "",
           created_at: new Date().toISOString(),
         });
-
-        await Email.send({
-          to: email,
-          text: "Hello World",
-          subject: "Hello World",
-          from: { email: "no-reply@harvexgroupe.com", name: "Harvex Groupe" },
+        const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+        fetch(`${baseUrl}/api/send`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: email,
+          }),
         });
 
         // await sendMail({

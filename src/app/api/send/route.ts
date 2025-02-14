@@ -4,13 +4,15 @@ import { auth } from "@/lib/auth";
 import { sendMail } from "@/lib/mail";
 
 export const GET = auth(async function GET(request) {
+  if (!request.auth)
+    return NextResponse.json({ message: "Not Authenticated" }, { status: 401 });
+
   try {
-    const email = request.auth?.user?.email;
+    const { email } = await request.json();
     console.log("email: ", email);
 
     await sendMail({
       to: email as string,
-      // to: "zampou.elec@gmail.com",
       body: WelcomeMail({ name: "Jean François" }),
       subject:
         "Bienvenue chez HARVEX GROUPE - Votre aventure financière commence maintenant !",
