@@ -38,4 +38,4 @@ export const GET = auth(async function GET(request) {
       { status: 500 }
     );
   }
-});
+}) as any;
