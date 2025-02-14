@@ -12,6 +12,7 @@ export async function GET() {
       subject:
         "Bienvenue chez HARVEX GROUPE - Votre aventure financière commence maintenant !",
     });
+    console.log("success email send");
 
     // sendMail({
     //   body: TestMail(),
@@ -35,6 +36,7 @@ export async function GET() {
       { status: 200 }
     );
   } catch (error) {
+    console.error("error email send: ", error);
     return NextResponse.json(
       {
         error,
