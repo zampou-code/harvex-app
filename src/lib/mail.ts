@@ -29,7 +29,7 @@ export async function sendMail({ to, subject, body }: sendMailType) {
       html: emailHtml,
       from: '"Harvex Groupe" <no-reply@harvexgroupe.com>',
     } satisfies nodemailer.SendMailOptions;
-    console.log("email: ", to);
+    console.log("email data: ", options);
 
     await transporter.sendMail(options);
     console.log("success email send");
