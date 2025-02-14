@@ -6,7 +6,7 @@ import { sendMail } from "@/lib/mail";
 
 export async function GET() {
   try {
-    sendMail({
+    await sendMail({
       to: "zampou.elec@gmail.com",
       body: WelcomeMail({ name: "Jean François" }),
       subject:
