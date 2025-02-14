@@ -165,8 +165,11 @@ export const POST = auth(async function POST(request) {
           created_at: new Date().toISOString(),
         });
 
+        console.log("email: ", email);
+
         await sendMail({
-          to: email,
+          to: "zampou.elec@gmail.com",
+          // to: email,
           subject: "Demande de retrait de fonds - HARVEX GROUPE",
           body: WithdrawalDemandMail({
             name: `${userData?.firstname} ${userData?.lastname}`,
