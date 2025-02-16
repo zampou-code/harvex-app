@@ -257,3 +257,17 @@ export function DialogMainBalanceWithdraw(
     </Dialog>
   );
 }
+
+// {
+// 	"type": "welcome",
+// 	"name": "Zampou Ibrahim",
+// 	"email": "zampou.elec@gmail.com"
+// }
+
+// "type": "investment",
+// "roi": 10000,
+// "name": "Zampou Ibrahim",
+// "amount": 5000,
+// "packName": "Pack nam",
+// "duration": 10,
+// "email": "sorhosylvie@gmail.com"

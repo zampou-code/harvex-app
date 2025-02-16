@@ -1,6 +1,10 @@
-import { Link, Tailwind, Text } from "@react-email/components";
+import { Tailwind, Text } from "@react-email/components";
 
-export function WelcomeMail({ name }: { name: string }) {
+type WelcomeMailProps = {
+  name: string;
+};
+
+export function WelcomeMail({ name }: WelcomeMailProps) {
   return (
     <Tailwind>
       <Text className="text-base leading-relaxed text-gray-700 capitalize mb-5">
@@ -15,28 +19,20 @@ export function WelcomeMail({ name }: { name: string }) {
         Ce que vous pouvez faire dès maintenant :
       </Text>
       <Text className="text-base leading-relaxed text-gray-700">
-        ✅ Accédez à votre compte en vous connectant ici :{" "}
-        <Link
-          className="text-[#e25c1d]"
-          href="https://www.harvexgroupe.com/login"
-        >
-          https://www.harvexgroupe.com/login
-        </Link>
+        ✅ Accédez à votre compte en vous connectant ici :
+        https://www.harvexgroupe.com/login
       </Text>
       <Text className="text-base leading-relaxed text-gray-700">
         ✅ Explorez nos différentes opportunités d&apos;investissement adaptées
         à vos objectifs financiers
       </Text>
       <Text className="text-base leading-relaxed text-gray-700 mb-5">
-        ✅ Contactez notre service client pour toute question à l&apos;adresse{" "}
-        <Text className="text-[#e25c1d]">contact@harvexgroupe.com</Text>
+        ✅ Contactez notre service client pour toute question à l&apos;adresse
+        contact@harvexgroupe.com
       </Text>
       <Text className="text-base leading-relaxed text-gray-700 mb-5">
         📲 Rejoignez notre communauté Telegram pour rester informé de nos offres
-        et actualités :{" "}
-        <Link href="https://t.me/harvexgroupe" className="text-[#e25c1d]">
-          https://t.me/harvexgroupe
-        </Link>
+        et actualités : https://t.me/harvexgroupe
       </Text>
       <Text className="text-base leading-relaxed text-gray-700 mb-5">
         Nous vous remercions pour votre confiance et restons à votre disposition
@@ -46,9 +42,7 @@ export function WelcomeMail({ name }: { name: string }) {
         L&apos;équipe HARVEX GROUPE
       </Text>
       <Text className="text-base leading-relaxed text-gray-700 mb-5">
-        <Link href="https://www.harvexgroupe.com" className="text-[#e25c1d]">
-          https://www.harvexgroupe.com
-        </Link>
+        https://www.harvexgroupe.com
       </Text>
       <Text className="text-base leading-relaxed text-gray-700 mb-5">
         Notre service client est disponible au :

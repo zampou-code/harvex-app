@@ -157,9 +157,9 @@ export const POST = auth(async function POST(request) {
             body: InvestmentConfirmationMail({
               name: `${userData?.firstname} ${userData?.lastname}`,
               packName: transaction?.pack?.name,
+              roi: Number(transaction?.pack?.roi),
               amount: Number(transaction?.pack?.amount),
               duration: transaction?.pack?.number_of_day,
-              estimatedAmount: Number(transaction?.pack?.roi),
               startDate: new Date().toISOString(),
               endDate: addDays(
                 new Date(),

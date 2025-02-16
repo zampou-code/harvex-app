@@ -170,10 +170,10 @@ export const POST = auth(async function POST(request) {
           to: userData?.email,
           subject: "Demande de retrait de fonds - HARVEX GROUPE",
           body: WithdrawalDemandMail({
-            name: `${userData?.firstname} ${userData?.lastname}`,
             method: payment_mean,
             amount: Number(amount),
             accountNumber: accountDoc.id.slice(0, 6),
+            name: `${userData?.firstname} ${userData?.lastname}`,
             date: new Date().toLocaleString("fr-FR", {
               day: "numeric",
               month: "long",
@@ -236,11 +236,11 @@ export const POST = auth(async function POST(request) {
             to: userData?.email,
             subject: "Demande d'investissement chez HARVEX GROUPE",
             body: InvestmentDemandMail({
-              name: `${userData?.firstname} ${userData?.lastname}`,
               packName: pack?.name,
+              roi: Number(pack?.roi),
               amount: Number(pack?.amount),
               duration: pack?.number_of_day,
-              estimatedAmount: Number(pack?.roi),
+              name: `${userData?.firstname} ${userData?.lastname}`,
             }),
           });
 
@@ -329,9 +329,9 @@ export const POST = auth(async function POST(request) {
             body: InvestmentConfirmationMail({
               name: `${userData?.firstname} ${userData?.lastname}`,
               packName: pack?.name,
+              roi: Number(pack?.roi),
               amount: Number(pack?.amount),
               duration: pack?.number_of_day,
-              estimatedAmount: Number(pack?.roi),
               startDate: new Date().toISOString(),
               endDate: addDays(new Date(), pack?.number_of_day).toISOString(),
             }),

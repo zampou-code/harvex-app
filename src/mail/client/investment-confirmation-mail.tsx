@@ -1,22 +1,24 @@
-import { Link, Tailwind, Text } from "@react-email/components";
+import { Tailwind, Text } from "@react-email/components";
+
+type InvestmentConfirmationMailProps = {
+  roi: number;
+  name: string;
+  amount: number;
+  packName: string;
+  endDate: string;
+  duration: number;
+  startDate: string;
+};
 
 export function InvestmentConfirmationMail({
+  roi,
   name,
-  packName,
   amount,
-  duration,
-  estimatedAmount,
-  startDate,
   endDate,
-}: {
-  name: string;
-  packName: string;
-  amount: number;
-  duration: number;
-  estimatedAmount: number;
-  startDate: string;
-  endDate: string;
-}) {
+  packName,
+  duration,
+  startDate,
+}: InvestmentConfirmationMailProps) {
   return (
     <Tailwind>
       <Text className="text-base leading-relaxed text-gray-700 mb-5">
@@ -39,7 +41,7 @@ export function InvestmentConfirmationMail({
         ✅ Durée de l&apos;investissement : {duration} jours
       </Text>
       <Text className="text-base leading-relaxed text-gray-700 mb-5">
-        ✅ Gain estimé : {estimatedAmount.toLocaleString()} FCFA
+        ✅ Gain estimé : {roi.toLocaleString()} FCFA
       </Text>
       <Text className="text-base leading-relaxed text-gray-700 mb-5">
         ✅ Date de début : {startDate}
@@ -55,13 +57,8 @@ export function InvestmentConfirmationMail({
         Suivi de votre investissement :
       </Text>
       <Text className="text-base leading-relaxed text-gray-700 mb-5">
-        📊 Accédez à votre tableau de bord ici :{" "}
-        <Link
-          className="text-[#e25c1d]"
-          href="https://www.harvexgroupe.com/login"
-        >
-          https://www.harvexgroupe.com/login
-        </Link>
+        📊 Accédez à votre tableau de bord ici :
+        https://www.harvexgroupe.com/login
       </Text>
       <Text className="text-base leading-relaxed text-gray-700 mb-5">
         📩 Pour toute question, notre support est disponible à
@@ -74,10 +71,7 @@ export function InvestmentConfirmationMail({
         L&apos;équipe HARVEX GROUPE
       </Text>
       <Text className="text-base leading-relaxed text-gray-700 mb-5">
-        <Link href="https://www.harvexgroupe.com" className="text-[#e25c1d]">
-          www.harvexgroupe.com
-        </Link>{" "}
-        / contact@harvexgroupe.com
+        www.harvexgroupe.com / contact@harvexgroupe.com
       </Text>
     </Tailwind>
   );

@@ -9,7 +9,6 @@ export const GET = auth(async function GET(request) {
 
   try {
     const { email } = await request.json();
-    console.log("email: ", email);
 
     await sendMail({
       to: email as string,

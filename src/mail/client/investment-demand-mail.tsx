@@ -1,18 +1,20 @@
-import { Link, Tailwind, Text } from "@react-email/components";
+import { Tailwind, Text } from "@react-email/components";
+
+type InvestmentDemandMailProps = {
+  roi: number;
+  name: string;
+  amount: number;
+  packName: string;
+  duration: number;
+};
 
 export function InvestmentDemandMail({
+  roi,
   name,
-  packName,
   amount,
+  packName,
   duration,
-  estimatedAmount,
-}: {
-  name: string;
-  packName: string;
-  amount: number;
-  duration: number;
-  estimatedAmount: number;
-}) {
+}: InvestmentDemandMailProps) {
   return (
     <Tailwind>
       <Text className="text-base leading-relaxed text-gray-700 mb-5">
@@ -29,14 +31,14 @@ export function InvestmentDemandMail({
         🔹 Pack choisi : {packName}
       </Text>
       <Text className="text-base leading-relaxed text-gray-700 mb-5">
-        🔹 Montant à investir : {amount.toLocaleString()} FCFA
+        🔹 Montant à investir : {amount} FCFA
       </Text>
       <Text className="text-base leading-relaxed text-gray-700 mb-5">
         🔹 Durée de l&apos;investissement : {duration} jours
       </Text>
       <Text className="text-base leading-relaxed text-gray-700 mb-5">
-        🔹 Montant estimé à recevoir à la fin de l&apos;investissement :{" "}
-        {estimatedAmount.toLocaleString()} FCFA
+        🔹 Montant estimé à recevoir à la fin de l&apos;investissement : {roi}{" "}
+        FCFA
       </Text>
       <Text className="text-base leading-relaxed text-gray-700 mb-5">
         Votre investissement est en attente de validation. Pour finaliser votre
@@ -44,25 +46,13 @@ export function InvestmentDemandMail({
         ligne via WhatsApp :
       </Text>
       <Text className="text-base leading-relaxed text-gray-700 mb-5">
-        <Link
-          href="https://wa.me/message/NJKVE6SPAMT4L1"
-          className="text-[#e25c1d]"
-        >
-          📲 WhatsApp: +225 0713065959
-        </Link>
+        📲 WhatsApp: +225 0713065959
       </Text>
       <Text className="text-base leading-relaxed text-gray-700 mb-5">
-        <Link
-          className="text-[#e25c1d]"
-          href="https://wa.me/message/GG4KDJEIZMVSA1"
-        >
-          📲 WhatsApp: +225 0718101078
-        </Link>
+        📲 WhatsApp: +225 0718101078
       </Text>
       <Text className="text-base leading-relaxed text-gray-700 mb-5">
-        <Link href="https://wa.me/+22370625684" className="text-[#e25c1d]">
-          📲 WhatsApp: +223 70 62 56 84
-        </Link>
+        📲 WhatsApp: +223 70 62 56 84
       </Text>
       <Text className="text-base leading-relaxed text-gray-700 mb-5">
         Dès que votre demande sera validée, vous recevrez un message de
@@ -73,13 +63,7 @@ export function InvestmentDemandMail({
       </Text>
       <Text className="text-base leading-relaxed text-gray-700 mb-5">
         ✅ Vous pouvez suivre l&apos;évolution de votre investissement en vous
-        connectant à votre espace client :
-        <Link
-          className="text-[#e25c1d]"
-          href="https://www.harvexgroupe.com/login"
-        >
-          https://www.harvexgroupe.com/login
-        </Link>
+        connectant à votre espace client : https://www.harvexgroupe.com/login
       </Text>
       <Text className="text-base leading-relaxed text-gray-700 mb-5">
         ✅ Pour toute question, notre service client est disponible à
@@ -98,9 +82,7 @@ export function InvestmentDemandMail({
         L&apos;équipe HARVEX GROUPE
       </Text>
       <Text className="text-base leading-relaxed text-gray-700 mb-5">
-        <Link href="https://www.harvexgroupe.com" className="text-[#e25c1d]">
-          www.harvexgroupe.com
-        </Link>
+        www.harvexgroupe.com
       </Text>
     </Tailwind>
   );
